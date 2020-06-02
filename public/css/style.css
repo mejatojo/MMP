@@ -1,0 +1,92 @@
+/* Override */
+/* Body */
+body{font-family:'Roboto',sans-serif!important;font-display:auto;font-size:14px!important;margin-top:35px;color:#6d7986!important;font-weight:500!important;}
+/* Color */
+.color-ffffff{color:#ffffff;}
+/* Menu */
+.navbar{padding:5px;}
+.navbar-light{box-shadow:0 0 10px #6d7885!important;}
+.bg-dark{background-color:#000000!important;}
+li.nav-item a{font-size:unset!important;}
+.navbar-expand-md .navbar-nav .nav-link{padding-right:1rem!important;padding-left:1rem!important;font-weight:500!important;}
+.navbar-nav>li{margin-top:auto;margin-bottom:auto;}
+.navbar-brand{padding-top:15px!important;padding-bottom:15px!important;}
+.navbar-brand img{width:55px;}
+/* Title */
+h1, .h1, h2, .h2, h3, .h3{margin-bottom:1.5rem!important;}
+h2, .h2{font-size:1.75rem;}
+h3, .h3{font-size:1.25rem!important;}
+/* Button */
+.btn-lg{padding:.75rem 1rem!important;font-size:1rem!important;}
+.btn-flat{border-radius:0!important;}
+.btn-color-white{color:#ffffff!important;}
+/* Personal CSS */
+.uppercase{text-transform:uppercase;}
+/* Menu */
+.navbar-nav>li.header-divider{border-left: 1px solid #aaaaaa80;height:20px;vertical-align:middle;position:relative;margin:auto 7.5px;}
+.menu-icon{margin-right:10px;}
+/* Banner */
+.hero{height:500px;display:flex;justify-content:center;flex-direction:column;padding-left:150px;padding-right:150px;}
+.no-webp .hero-home{background: url('../images/background/abstract-background-hero-home.jpg') no-repeat center top;background-size:cover;color:#ffffff;}
+.webp .hero-home{background: url('../images/background/abstract-background-hero-home.webp') no-repeat center top;background-size:cover;color:#ffffff;}
+.no-webp .hero-contact{background: url('../images/background/abstract-background-hero-contact.jpg') no-repeat center top;background-size:cover;color:#ffffff;}
+.webp .hero-contact{background: url('../images/background/abstract-background-hero-contact.webp') no-repeat center top;background-size:cover;color:#ffffff;}
+/* Content */
+a{color:#17a2b7;}
+a:hover{text-decoration:none;color:#17a2b7;font-weight:400;}
+textarea{resize:none;height:150px!important;}
+section{padding:125px 5px;}
+.no-webp .bg-section{background: url('../images/background/default-abstract-background-section.jpg') no-repeat center top;background-size:cover;color:#ffffff;}
+.webp .bg-section{background: url('../images/background/default-abstract-background-section.webp') no-repeat center top;background-size:cover;color:#ffffff;}
+.no-webp .bg-section-blue{background: url('../images/background/default-blue-abstract-background-section.jpg') no-repeat center top;background-size:cover;color:#ffffff;}
+.webp .bg-section-blue{background: url('../images/background/default-blue-abstract-background-section.webp') no-repeat center top;background-size:cover;color:#ffffff;}
+p{line-height:24px!important;font-size:14px!important;}
+b{font-weight:700!important;}
+p b{font-weight:400!important;}
+h2 b{font-weight:500!important;}
+h3 b, button b{font-weight:400!important;}
+input, textarea, button{border-radius:0!important;}
+.callout.rule,.callout-blue.rule{border-bottom:1px solid #dee0df;text-align:center;letter-spacing:2px;position:relative;font-size:13px!important;margin-bottom:3.5rem!important;}
+.callout.rule{color:#f4645f;}
+.callout-blue.rule{color:#2e90cd;}
+.callout.rule .text,.callout-blue.rule .text{position:relative;top:9px;background:#fff;padding:0 20px;}
+.text-center{text-align:center!important;}
+.one-col{padding-left:150px;padding-right:150px;}
+.content-col{padding:15px 30px 20px;}
+.metro-shadow{}
+.metro-border{border:2px solid #e5e5e5;border-radius:2px;}
+.review-avatar,.review-category{margin-bottom:10px;}
+.review-star-on{color:#fc8c13;}
+.form-control{font-size:13px!important;}
+.contact-infos-list{padding:0;}
+.contact-infos-list li{list-style:none;line-height:30px;}
+.error-message{color:#f4645f;}
+.form-control.is-invalid{border-color:#f4645f!important;}
+/* Footer */
+footer{background:#f1f1f1;color:#828383;box-shadow:0 0 15px #6d7885;}
+.footer-menu{padding:30px 5px;}
+.footer-menu-title{margin-bottom:1.5rem;}
+.footer-menu-list ul{padding:0;}
+.footer-menu-list ul li{list-style:none;line-height:30px;}
+.footer-menu-list ul li a{color:#6d7986;}
+.footer-menu-list ul li a:hover{color:#6d7986;}
+
+@media only screen and (max-width: 48em) {
+/*************** ADD MOBILE ONLY CSS HERE  ***************/
+/* Menu */
+.offcanvas-collapse{top:77px!important;background:#f8f9fa;}
+.navbar-light .navbar-nav .nav-link{line-height:35px;}
+/* Banner */
+.hero{text-align:center;padding-left:0px;padding-right:0px;}
+.no-webp .hero-home{background: url('../images/background/default-abstract-background-section.jpg') no-repeat center top;background-size:cover;color:#ffffff;}
+.no-webp .hero-contact{background: url('../images/background/default-blue-abstract-background-section.jpg') no-repeat center top;background-size:cover;color:#ffffff;}
+.webp .hero-home{background: url('../images/background/default-abstract-background-section.webp') no-repeat center top;background-size:cover;color:#ffffff;}
+.webp .hero-contact{background: url('../images/background/default-blue-abstract-background-section.webp') no-repeat center top;background-size:cover;color:#ffffff;}
+/* Content */
+section [class*='col-md-']{margin-bottom:25px;}
+.callout.rule .text{padding:0 5px;}
+.one-col{padding-left:0px;padding-right:0px;}
+.mobile-button{text-align:center;}
+/* Section and Footer */
+footer, section{text-align:center;}
+}
