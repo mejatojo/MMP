@@ -72,6 +72,7 @@
                   <th>Model</th>
                   <th>Entreprise</th>
                   <th>Etat pneumatique</th>
+                  <th>kilometrage</th>
                   <th>Permutation</th>
                   <th>Maintenance</th>
                   <th>Stationnement</th>
@@ -462,10 +463,11 @@
 		                  	</div>
 		                  	@endif
 		                  </td> -->
+		                  <td>{{$vehicule->kilometrage}}</td>
 		                  <td>
-		                  @if(10000-$vehicule->kilometrage>0)
+		                  @if($vehicule->permutation>0)
 		                  	<span hidden>{{$permutation=0}}</span>
-		                  	Dans {{10000-$vehicule->kilometrage}} km
+		                  	Dans {{$vehicule->permutation}} km
 		                  	@else
 		                  	Dans 0 km
 		                  	<span hidden>{{$permutation=1}}</span>

@@ -341,17 +341,17 @@
                             </div>
                             @endif
                           @endif
-                        </div>
+                        </div> 
                       </td>
                       <td>
                         Permutation dans
                          @if(count(unserialize($vehicule->t2))==8)
                         <!-- {{round(unserialize($vehicule->t2)[6]-(((unserialize($vehicule->t1)[6]-unserialize($vehicule->t2)[6])/$diff))*$difference,2)}} km -->
                         <span hidden>
-                          {{$k=$vehicule->kilometrage}}
+                          {{$k=$vehicule->permutation}}
                           {{$countk=0}}
-                          @while($k<10000)
-                          {{$k=$k+(unserialize($vehicule->t2)[6]-unserialize($vehicule->t1)[6])/$diff}}
+                          @while($k>0)
+                          {{$k=$k-(unserialize($vehicule->t2)[6]-unserialize($vehicule->t1)[6])/$diff}}
                           {{$countk++}}
                           @endwhile
                           {{$dateprevuk=date('y-m-d',strtotime($datec)+86400*$countk)}}
@@ -363,10 +363,10 @@
                            km/j)
                        @else
                        <span hidden>
-                          {{$k=$vehicule->kilometrage}}
+                          {{$k=$vehicule->permutation}}
                           {{$countk=0}}
-                          @while($k<10000)
-                          {{$k=$k+(unserialize($vehicule->t2)[4]-unserialize($vehicule->t1)[4])/$diff}}
+                          @while($k>0)
+                          {{$k=$k-(unserialize($vehicule->t2)[4]-unserialize($vehicule->t1)[4])/$diff}}
                           {{$countk++}}
                           @endwhile
                            {{$dateprevuk=date('y-m-d',strtotime($datec)+86400*$countk)}}
@@ -493,44 +493,7 @@
                           @endif
                         </div></td>
                         <td>
-                          <span hidden>
-                            @if($vehicule->kilometrage==0 and count(unserialize($vehicule->t1))==8)
-                            {{$isa=(strtotime($vehicule->control)-strtotime($vehicule->dateC))/86400}}:
-                            {{$jour=($isa*10000)/unserialize($vehicule->t1)[6]}}
-                             {{$dateper=date('y-m-d',strtotime($vehicule->control)+86400*$jour)}}
-                            {{$countPer=(strtotime($dateper)-strtotime(date('y-m-d')))/86400}}
-                            {{$countPer=$countPer+(strtotime($vehicule->control)-strtotime(unserialize($vehicule->t1)[7]))/86400}}
-                            @elseif($vehicule->kilometrage==0 and count(unserialize($vehicule->t1))==6)
-                            {{$isa=(strtotime($vehicule->control)-strtotime($vehicule->dateC))/86400}}:
-                            {{$jour=($isa*10000)/unserialize($vehicule->t1)[4]}}
-                             {{$dateper=date('y-m-d',strtotime($vehicule->control)+86400*$jour)}}
-                            {{$countPer=(strtotime($dateper)-strtotime(date('y-m-d')))/86400}}
-                            {{$countPer=$countPer+(strtotime($vehicule->control)-strtotime(unserialize($vehicule->t1)[5]))/86400}}
-                            @else
-                            {{$isa=(strtotime($vehicule->control)-strtotime($vehicule->dateC))/86400}}:
-                            {{$jour=($isa*10000)/$vehicule->kilometrage}}{{$jour=$jour-$isa}}
-                             {{$dateper=date('y-m-d',strtotime($vehicule->control)+86400*$jour)}}
-                            {{$countPer=(strtotime($dateper)-strtotime(date('y-m-d')))/86400}}
-                            @endif
-                          </span>
-                          Permutation dans {{$countPer}} jours soit le
-                          {{date('d/m/Y',strtotime($dateper))}}
-                          @if(isset(unserialize($vehicule->t1)[1]) and isset(unserialize($vehicule->t2)[1]))
-                     
-                     @if(count(unserialize($vehicule->t2))==8)
-                        <span hidden>
-                          {{$diff=(strtotime(unserialize($vehicule->t2)[7])-strtotime(unserialize($vehicule->t1)[7]))/86400}}
-                          @if($diff==0){{$diff=1}}@endif
-                        </span>
-                       {{ (unserialize($vehicule->t2)[6]-unserialize($vehicule->t1)[6])/$diff}} km/jour
-                       @else
-                       <span hidden>
-                          {{$diff=(strtotime(unserialize($vehicule->t2)[5])-strtotime(unserialize($vehicule->t1)[5]))/86400}}
-                          @if($diff==0){{$diff=1}}@endif
-                        </span>
-                       {{ (unserialize($vehicule->t2)[4]-unserialize($vehicule->t1)[4])/$diff}} km/jour
-                       @endif
-                       @else
+                          
                           <span hidden>
                             @if(count(unserialize($vehicule->t1))==8)
                             {{$isa=(strtotime(unserialize($vehicule->t1)[7])-strtotime($vehicule->dateC))/86400}}
@@ -540,9 +503,17 @@
                             {{$isa=(strtotime(unserialize($vehicule->t1)[5])-strtotime($vehicule->dateC))/86400}}
                             {{$kj=unserialize($vehicule->t1)[4]/$isa}}
                             @endif
+                            {{$p=$vehicule->permutation}}
+                            {{$count=0}}
+                          @while($p>0)
+                            {{$p=$p-$kj}}
+                            {{$count++}}
+                          @endwhile
+                            {{$dateprevuk=date('y-m-d',strtotime($vehicule->control)+86400*$count)}}
+                            {{$countAuk=(strtotime($dateprevuk)-strtotime(date('y-m-d')))/86400}}
                           </span>
+                          Dans {{$countAuk}} jours soit le {{date('d/m/Y',strtotime($dateprevuk))}}
                           ({{round($kj)}} km / jour)
-                       @endif
                         </td>
                         <td>
                        <!-- <span hidden>

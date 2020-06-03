@@ -1,6 +1,6 @@
 @extends('dashboard.dashboard')
 @section('content')
-	<a class="btn btn-warning" href="mytextdocument{{date('d_m_Y')}}.sql">Effectuer une sauvegarde</a>
+	<a class="btn btn-warning" href="mytextdocument{{date('d_m_Y')}}.sql" download>Effectuer une sauvegarde</a>
 	<a class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">Importer les données</a>
 
 	<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

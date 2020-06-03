@@ -25,6 +25,7 @@
     #div1, #div2 ,#div3,#div4,#div5,#div6{
   float: left;
   border: 1px solid black;
+  height: 1.5cm;
 }
 #dv1, #dv2 ,#dv3,#dv4,#dv5,#dv6{
   float: left;

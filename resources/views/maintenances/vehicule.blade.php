@@ -283,14 +283,14 @@
                         <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)" class="col-3">
                           <div style="width: 100%;height: 100%" draggable="true" ondragstart="drag(event)" id="drag1" class="list">
                             <font color="black">{{unserialize($vehicule->hGomme)[0]}} mm<br>
-                              {{unserialize($vehicule->etatPneu)[0]}} bar</font>
+                              </font>
                           </div>
                            <input type="text" name="place[]" hidden="true" value="0">
                       </div>
                       <div id="div2" ondrop="drop(event)" ondragover="allowDrop(event)" class="col-3">
                         <div style="width: 100%;height: 100%" draggable="true" ondragstart="drag(event)" id="drag2" class="list">
                          <font color="brown"> {{unserialize($vehicule->hGomme)[1]}} mm<br>
-                              {{unserialize($vehicule->etatPneu)[1]}} bar</font>
+                              </font>
                         </div>
                         <input type="text" name="place[]" hidden="true" value="1">
                       </div>
@@ -299,7 +299,7 @@
                         <div id="div5" ondrop="drop(event)" ondragover="allowDrop(event)" class="col-3">
                         <div style="width: 100%;height: 100%" draggable="true" ondragstart="drag(event)" id="drag5" class="list">
                           <font color="yellow">{{unserialize($vehicule->hGomme)[4]}} mm<br>
-                              {{unserialize($vehicule->etatPneu)[4]}} bar</font>
+                              </font>
                         </div>
                         <input type="text" name="placeS[]"  hidden="true" value="4">
                       </div>
@@ -309,14 +309,14 @@
                       <div id="div3" ondrop="drop(event)" ondragover="allowDrop(event)" class="col-3">
                         <div style="width: 100%;height: 100%" draggable="true" ondragstart="drag(event)" id="drag3" class="list">
                           <font color="red">{{unserialize($vehicule->hGomme)[2]}} mm<br>
-                              {{unserialize($vehicule->etatPneu)[2]}} bar</font>
+                              </font>
                         </div>
                         <input type="text" name="place[]"  hidden="true" value="2">
                       </div>
                       <div id="div4" ondrop="drop(event)" ondragover="allowDrop(event)" class="col-3">
                         <div style="width: 100%;height: 100%" draggable="true" ondragstart="drag(event)" id="drag4" class="list">
                           <font color="green">{{unserialize($vehicule->hGomme)[3]}} mm<br>
-                              {{unserialize($vehicule->etatPneu)[3]}} bar</font>
+                             </font>
                         </div>
                         <input type="text" name="place[]" hidden="true" value="3">
                       </div>
@@ -324,7 +324,7 @@
                         <div id="div6" ondrop="drop(event)" ondragover="allowDrop(event)" class="col-3">
                         <div style="width: 100%;height: 100%" draggable="true" ondragstart="drag(event)" id="drag6" class="list">
                           <font color="blue"> {{unserialize($vehicule->hGomme)[5]}} mm<br>
-                              {{unserialize($vehicule->etatPneu)[5]}} bar</font>
+                              </font>
                         </div>
                         <input type="text" name="placeS[]"  hidden="true" value="5">
                       </div>
@@ -462,8 +462,9 @@
                   </div>
                 </div>
                 <!--véhicules-->
-                <div class="col-4" style="border-style: ridge;height: 17.5cm;text-align: center;">
+                <div class="col-4" style="border-style: ridge;height: 18cm;text-align: center;">
                   <h4>Kilomètrage:{{$vehicule->kilometrage}}<br>
+                    Permutation dans {{$vehicule->permutation}} km <br>
                     Dernière maintenance: {{date('d/m/Y',strtotime($vehicule->derniereMaintenance))}}<br>
                     Couple serrage : {{$vehicule->serrage}} nm<br>
                     Type de permutation : {{$vehicule->type}}<br>

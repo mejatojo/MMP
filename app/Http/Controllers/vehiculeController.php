@@ -111,7 +111,7 @@ class vehiculeController extends Controller
         {
         	$vehicules=DB::table('vehicules')
             ->join('users','users.id','vehicules.conducteur_id')
-            ->selectRaw('model,marque,immatriculation,entreprise,hGomme,refPneus,etatPneu,kilometrage,derniereMaintenance,vehicules.id as id,alert,name,phone,email,dateC,t1,t2,serrage,type,vehicules.active,nomH,emailH,phoneH,observations,imageV,factureV,control,information,serrage,pneu,imageV2,stationnement')
+            ->selectRaw('model,marque,immatriculation,entreprise,hGomme,refPneus,etatPneu,kilometrage,derniereMaintenance,vehicules.id as id,alert,name,phone,email,dateC,t1,t2,serrage,type,vehicules.active,nomH,emailH,phoneH,observations,imageV,factureV,control,information,serrage,pneu,imageV2,stationnement,permutation')
             ->where('vehicules.active','!=',1)
             ->get();
             $RendezVous=RendezVous::All();
@@ -129,7 +129,7 @@ class vehiculeController extends Controller
             $refPneus=Reference::All();
             $vehicules=DB::table('vehicules')
             ->join('users','users.id','vehicules.conducteur_id')
-            ->selectRaw('model,marque,immatriculation,entreprise,hGomme,refPneus,etatPneu,kilometrage,derniereMaintenance,vehicules.id as id,alert,name,phone,email,dateC,serrage,type,t1,t2,vehicules.active,nomH,emailH,phoneH,observations,imageV,factureV,control,information,serrage,pneu,imageV2,stationnement')
+            ->selectRaw('model,marque,immatriculation,entreprise,hGomme,refPneus,etatPneu,kilometrage,derniereMaintenance,vehicules.id as id,alert,name,phone,email,dateC,serrage,type,t1,t2,vehicules.active,nomH,emailH,phoneH,observations,imageV,factureV,control,information,serrage,pneu,imageV2,stationnement,permutation')
             ->where('entreprise',auth()->user()->entreprise)
             ->where('vehicules.active','!=',1)
             ->get();
@@ -306,7 +306,6 @@ class vehiculeController extends Controller
             'immatriculation' => 'required',
             'marque' => 'required',
             'model' => 'required',
-            'pne' => 'required',
             'datec' => 'required',
             'dmaintenance' => 'required',
         ]);
@@ -321,6 +320,8 @@ class vehiculeController extends Controller
         $mail=User::find($req->conducteur);
     	$vehicule=new Vehicule();
         $vehicule->conducteur_id=$req->conducteur;
+        $vehicule->permutation=10000;
+        $vehicule->dpermutation=date('Y-m-d');
     	$vehicule->immatriculation=$req->immatriculation;
     	$vehicule->marque=$req->marque;
     	$vehicule->model=$req->model;
@@ -431,17 +432,21 @@ class vehiculeController extends Controller
                     return redirect()->back()->with($notif);
                 }
              }
-            $vehicule->kilometrage=0;
+            $vehicule->permutation=10000;
             for($i=0;$i<count(unserialize($vehicule->etatPneu));$i++)
             {
                 $a=$tab[$i];
-                        $etatPneu[$i]=unserialize($vehicule->etatPneu)[$a];
-                        $etatPneuInit[$i]=unserialize($vehicule->etatPneuInit)[$a];
+                        // $etatPneu[$i]=unserialize($vehicule->etatPneu)[$a];
+                        // $etatPneuInit[$i]=unserialize($vehicule->etatPneuInit)[$a];
                         $hGomme[$i]=unserialize($vehicule->hGomme)[$a];
                         $ref[$i]=unserialize($vehicule->refPneus)[$a];
+                        $t1[$i]=unserialize($vehicule->hGomme)[$a];
             }
-            $vehicule->etatPneu=serialize($etatPneu);
-            $vehicule->etatPneuInit=serialize($etatPneuInit);
+            // $vehicule->etatPneu=serialize($etatPneu);
+            array_push($t1,$vehicule->kilometrage,date("Y/m/d"));
+            $vehicule->t1=serialize($t1);
+            $vehicule->t2=null;
+            // $vehicule->etatPneuInit=serialize($etatPneuInit);
             $vehicule->hGomme=serialize($hGomme);
             $vehicule->refPneus=serialize($ref);
             $maintenanceUpdates=DB::table('maintenances')
@@ -480,7 +485,7 @@ class vehiculeController extends Controller
                 $st=new Stock();
                 $st->reference_id=$req->ref[$in];
                 $st->quantite=0;
-                $st->date=date('Y_m-d');
+                $st->date=date('Y-m-d');
                 $st->save();
                 $tref[$in]=$st->id;
             }
@@ -526,8 +531,16 @@ class vehiculeController extends Controller
         }
         $vehicule->control=date("Y/m/d");
         $vehicule->hGomme=serialize($req->hg);
+        $permutation=$req->kilometrage-$vehicule->kilometrage;
+        if($vehicule->permutation-$permutation<=0)
+        {
+            $vehicule->permutation=0;
+        }
+        else
+        {
+            $vehicule->permutation=$vehicule->permutation-$permutation;
+        }
     	$vehicule->kilometrage=$req->kilometrage;
-          $vehicule->dateC=$req->datec;
         $vehicule->dernierePerte=date("Y/m/d");
         }
     	$vehicule->save();

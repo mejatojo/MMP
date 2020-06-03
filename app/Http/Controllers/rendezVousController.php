@@ -267,8 +267,9 @@ class rendezVousController extends Controller
         $rendez_Vous=DB::table('rendez_vous')
                 ->join('vehicules','vehicules.id','rendez_vous.vehicule_id')
                 ->join('users','users.id','vehicules.conducteur_id')
-                ->selectRaw('users.*,vehicules.*,rendez_vous.*')
+                ->selectRaw('users.*,vehicules.*,rendez_vous.*,vehicules.active')
                 ->where('date',date('y-m-d'))
+                ->where('vehicules.active',0)
                 ->where('accepted',2)
                 ->where('finished','!=',2)
                 ->orderBy('heure','asc')
@@ -285,7 +286,8 @@ class rendezVousController extends Controller
         {
         $rdvRapides=DB::table('vehicules')
                 ->join('users','users.id','vehicules.conducteur_id')
-                ->selectRaw('immatriculation,marque,model,entreprise,email,phone,vehicules.id as id')
+                ->selectRaw('immatriculation,marque,model,entreprise,email,phone,vehicules.id as id,vehicules.active')
+                ->where('vehicules.active',0)
                 ->get();
        return view('maintenances.maintenanceRapide')->with('rdvRapides',$rdvRapides);
         } 
