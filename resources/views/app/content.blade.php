@@ -2,8 +2,8 @@
 @section('content')
 <section id="hero">
     <div class="hero-container" data-aos="fade-up">
-      <h1>Bienvenue chez MMP06</h1>
-      <h2>Confiez-nous la maintenance pneumatique de vos vehicules</h2>
+      <h1>Maintenance Mobile des Pneumatiques</h1>
+      <h2>Assistante à la gestion de flotte automobile</h2>
       <a href="#about" class="btn-get-started scrollto">Decouvrir</a>
     </div>
   </section><!-- End Hero -->
@@ -21,27 +21,28 @@
 
           <div class="col-xl-6 col-lg-6 d-flex flex-column align-items-stretch justify-content-center py-5 px-lg-5">
             <div class="box-heading" data-aos="fade-up">
-              <h4>MMP06</h4>
-              <h3>Expert en maintenance pneumatique a Paris</h3>
-              <p>Situe au coeur de la ville de Paris, MMP06 vous offre ses services de maintenance pneumatique pour les vehicules legers. Les services au sein de MMP06 sont effectues par des professionnels qui assureront votre satisfaction pour la maintenacnce pneumatique de vos vehicules.</p>
+              <h4>MMP</h4>
+              <h3>La solution pour votre flotte automobile !</h3>
+              <p>La maintenance Mobile prédictive pour tous les pneus de votre flotte automobile.</p>
             </div>
 
             <div class="icon-box" data-aos="fade-up">
-              <div class="icon"><i class="bx bx-fingerprint"></i></div>
-              <h4 class="title"><a href="">Verification</a></h4>
-              <p class="description">Avant de passer a la maintenance nous verifions quel service devra subir vos roues.</p>
+              <div class="icon"><i class="bx bx-wrench"></i></div>
+              <h4 class="title">Maintenance</h4>
+              <p class="description">La maintenance Mobile prédictive pour tous les pneus de votre flotte automobile. 
+              Avec un contrat de maintenance "objectif 1.6 mm " Un passage régulier et programmé pour une remise en pression de votre parc auto. </p>
             </div>
 
             <div class="icon-box" data-aos="fade-up" data-aos-delay="100">
-              <div class="icon"><i class="bx bx-gift"></i></div>
-              <h4 class="title"><a href="">RDV</a></h4>
-              <p class="description">Vous avez la possibilite de choisir votre date de rendez-vous tant que cette derniere soit encore disponible.</p>
+              <div class="icon"><i class="bx bx-disc"></i></div>
+              <h4 class="title"><a href="">Changement</a></h4>
+              <p class="description">Changement de pneu en mobilité sans modifier l'activité de l'entreprise .</p>
             </div>
 
             <div class="icon-box" data-aos="fade-up" data-aos-delay="200">
               <div class="icon"><i class="bx bx-atom"></i></div>
-              <h4 class="title"><a href="">Service 3</a></h4>
-              <p class="description">Explicabo est voluptatum asperiores consequatur magnam. Et veritatis odit. Sunt aut deserunt minus aut eligendi omnis</p>
+              <h4 class="title"><a href="">Autre </a></h4>
+              <p class="description">Des prix négociés pour les pneus de votre flotte . Une interface web sécurisée pour la visualisation et le suivi de tout le parc auto avec des statistiques sur chaque pneu</p>
             </div>
 
           </div>
@@ -55,34 +56,47 @@
       <div class="container">
 
         <div class="section-title" data-aos="zoom-in">
-          <h2>MMP06</h2>
+          <h2>MMP</h2>
           <h3>Pourquoi <span>nous choisir</span>?</h3>
-          <p>Avec le professionnalisme de MMP06, vous n'aurez plus qu'a faire le plein et rouler sans crainte.</p>
+          <p>Avec le professionnalisme de MMP, vous n'aurez plus qu'a faire le plein et rouler sans crainte.</p>
         </div>
 
         <div class="row">
 
-          <div class="col-lg-4">
+          <div class="col-lg-3">
             <div class="box" data-aos="fade-up">
-              <span>01</span>
-              <h4>Travail soigne</h4>
-              <p>Vous meritez le meilleur service de maintenance pneumatique, c'est pourquoi MMP06 fait en sorte que des pros s'occupent de vos vehicules.</p>
+              <h4>25 000 €</h4>
+              <p>C'est la dépense supplémentaire que fera une flotte de 50 véhicules pour un non suivi de ses pneumatiques .</p>
+              <br><br><br><br><br>
             </div>
           </div>
 
-          <div class="col-lg-4 mt-4 mt-lg-0">
+          <div class="col-lg-3 mt-4 mt-lg-0">
             <div class="box" data-aos="fade-up" data-aos-delay="100">
-              <span>02</span>
-              <h4>SAM</h4>
-              <p>MMP06 offre a ses clients des services apres maintenance de leur vehicule pour qu'ils puissent jouir de la qualite de travail faite par MMP06</p>
+              <h4>330 litres</h4>
+              <p>de carburant par an, c'est la surconsommation d'un véhicule n'ayant pas de suivi de pression ! <br>
+              </p>
+                <b>Avez-vous un suivi de pression de votre flotte</b>
+                <br><br><br><br><br>
             </div>
           </div>
 
-          <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="200">
+          <div class="col-lg-3 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="200">
             <div class="box">
-              <span>03</span>
-              <h4>Service 3</h4>
-              <p>Molestiae officiis omnis illo asperiores. Aut doloribus vitae sunt debitis quo vel nam quis</p>
+              <h4>12 000 km </h4>
+              <p>C'est la distance que ne parcouront pas vos pneus à cause d'un remplacement prématuré ! </p>
+                <b>Connaissez-vous la distance parcourue par vos pneus ?</b>
+                <br><br><br><br>
+            </div>
+          </div>
+
+          <div class="col-lg-3 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="200">
+            <div class="box">
+              <h4>3.1 mm</h4>
+              <p>c'est l'usure moyenne d'un pneu remplacé alors que la législation autorise </p>
+              <h4>1.6 mm</h4>
+              <p>de gomme dans les conditions de sécurité </p>
+              <b>Connaissez-vous l'usure de vos pneus remplacés ?</b>
             </div>
           </div>
 
@@ -128,8 +142,8 @@
 
         <div class="text-center">
           <h3>Prenez RDV des maintenant. </h3>
-          <p> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-          <a class="cta-btn" href="#">Contacter</a>
+          <p></p>
+          <a class="cta-btn" href="#contact">Contacter</a>
         </div>
 
       </div>
@@ -140,33 +154,33 @@
       <div class="container">
 
         <div class="section-title" data-aos="zoom-in">
-          <h2>MMP06</h2>
+          <h2>MMP</h2>
           <h3>Nos <span>Services</span></h3>
-          <p>Ut possimus qui ut temporibus culpa velit eveniet modi omnis est adipisci expedita at voluptas atque vitae autem.</p>
+          <p>La société MMP  innove par un service unique de gestion et de suivi dédié aux pneumatiques afinoptimiser leurs utilisations</p>
         </div>
 
         <div class="row">
           <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
             <div class="icon-box" data-aos="zoom-in">
-              <div class="icon"><i class="bx bxl-dribbble"></i></div>
-              <h4><a href="">Pression</a></h4>
-              <p>Voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi</p>
+              <div class="icon">01</div>
+              <!-- <h4><a href="">Pression</a></h4> -->
+              <p>MMP met en œuvre grâce à son atelier mobile toute les maintenances des pneus en évitantl'immobilisation du véhicule pendant l'activité de l'entreprise.</p>
             </div>
           </div>
 
           <div class="col-lg-4 col-md-6 d-flex align-items-stretch mt-4 mt-md-0">
             <div class="icon-box" data-aos="zoom-in" data-aos-delay="100">
-              <div class="icon"><i class="bx bx-file"></i></div>
-              <h4><a href="">Permutation</a></h4>
-              <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
+              <div class="icon">02</div>
+              <!-- <h4><a href="">Permutation</a></h4> -->
+              <p>Ce service unique et innovant permet aux entreprises de faire des coût non négligeable tout en ayantune maintenance écoresponsable et raisonné des pneus de leur flotte.</p>
             </div>
           </div>
 
           <div class="col-lg-4 col-md-6 d-flex align-items-stretch mt-4 mt-lg-0">
             <div class="icon-box" data-aos="zoom-in" data-aos-delay="200">
-              <div class="icon"><i class="bx bx-tachometer"></i></div>
-              <h4><a href="">Remplacement</a></h4>
-              <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia</p>
+              <div class="icon">03</div>
+              <!-- <h4><a href="">Remplacement</a></h4> -->
+              <p>Les économies liées à cette maintenance sont estimées à plus de 500 euros /an/véhicule.La sécurité des conducteurs est augmentée de façon considérable.</p>
             </div>
           </div>
 
@@ -179,11 +193,11 @@
 
     
     <!-- ======= Team Section ======= -->
-    <section id="team" class="team">
+    <!-- <section id="team" class="team">
       <div class="container">
 
         <div class="section-title" data-aos="zoom-in">
-          <h2>MMP06</h2>
+          <h2>MMP</h2>
           <h3>Notre <span>Equipe</span></h3>
           <p>Ut possimus qui ut temporibus culpa velit eveniet modi omnis est adipisci expedita at voluptas atque vitae autem.</p>
         </div>
@@ -265,7 +279,7 @@
         </div>
 
       </div>
-    </section><!-- End Team Section -->
+    </section> --><!-- End Team Section -->
 
     
 
@@ -280,8 +294,7 @@
         </div>
 
         <div>
-          <iframe style="border:0; width: 100%; height: 270px;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10500.899077973541!2d2.2913514937138735!3d48.853924137374676!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e6701f7e8337b5%3A0xa2cb58dd28914524!2sEiffel%20Tower%2C%20Paris%2C%20France!5e0!3m2!1sfr!2smg!4v1588238626361!5m2!1sfr!2smg" frameborder="0" allowfullscreen></iframe>
-
+          <iframe scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Villeneuve-Loubet,%20France+(My%20Business%20Name)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed" style="border:0; width: 100%; height: 270px;" frameborder="0"></iframe><a href="http://www.gps.ie/">Google Maps GPS</a>
         </div>
 
         <div class="row mt-5">
@@ -291,19 +304,19 @@
               <div class="address">
                 <i class="icofont-google-map"></i>
                 <h4>Location:</h4>
-                <p>Tour Eiffel, Paris</p>
+                <p>Villeneuve Loubet</p>
               </div>
 
               <div class="email">
                 <i class="icofont-envelope"></i>
                 <h4>Email:</h4>
-                <p>mail@exemple.com</p>
+                <p>contactmmp06@gmail.com</p>
               </div>
 
               <div class="phone">
                 <i class="icofont-phone"></i>
                 <h4>Telephone :</h4>
-                <p>+33 06 123 456 789</p>
+                <p>06 82 41 86 92</p>
               </div>
 
             </div>
@@ -312,33 +325,55 @@
 
           <div class="col-lg-8 mt-5 mt-lg-0" data-aos="fade-left">
 
-            <form action="forms/contact.php" method="post" role="form" class="php-email-form">
+            <!-- <form action="https://mail.google.com/mail/" method="get">
               <div class="form-row">
                 <div class="col-md-6 form-group">
-                  <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" data-rule="minlen:4" data-msg="Please enter at least 4 chars" />
+                  <input type="text" name="view" hidden value="cm">
+                  <input type="text" name="fs" hidden="" value="1">
+                  <input type="text" name="to"  hidden value="contactmmp06@gmail.com">
+                  <input type="text" name="name" class="form-control" id="name" placeholder="Votre nom" data-rule="minlen:4" data-msg="Au moins 4 caractères" />
                   <div class="validate"></div>
                 </div>
                 <div class="col-md-6 form-group">
-                  <input type="email" class="form-control" name="email" id="email" placeholder="Your Email" data-rule="email" data-msg="Please enter a valid email" />
+                  <input type="email" class="form-control" name="email" id="email" placeholder="Votre email" data-rule="email" data-msg="Entrer un email valide" />
                   <div class="validate"></div>
                 </div>
               </div>
               <div class="form-group">
-                <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" data-rule="minlen:4" data-msg="Please enter at least 8 chars of subject" />
+                <input type="text" class="form-control" name="su" id="subject" placeholder="Sujet" data-rule="minlen:4" data-msg="Au moins 8 caractères" />
                 <div class="validate"></div>
               </div>
               <div class="form-group">
-                <textarea class="form-control" name="message" rows="5" data-rule="required" data-msg="Please write something for us" placeholder="Message"></textarea>
+                <textarea class="form-control" name="body" rows="5" data-rule="required" data-msg="Vous devez écrire quelque chose" placeholder="Message"></textarea>
                 <div class="validate"></div>
               </div>
-              <div class="mb-3">
-                <div class="loading">Chargement</div>
-                <div class="error-message"></div>
-                <div class="sent-message">Votre message a bien ete envoye!</div>
+              <div class="text-center"><button type="submit">Envoyer</button></div>
+            </form> -->
+            <form action="/contacter" method="post">
+              @csrf
+              <div class="form-row">
+                <div class="col-md-6 form-group">
+                  <input type="text" name="view" hidden value="cm">
+                  <input type="text" name="fs" hidden="" value="1">
+                  <input type="text" name="to"  hidden value="contactmmp06@gmail.com">
+                  <input type="text" name="name" class="form-control" id="name" placeholder="Votre nom" data-rule="minlen:4" data-msg="Au moins 4 caractères" />
+                  <div class="validate"></div>
+                </div>
+                <div class="col-md-6 form-group">
+                  <input type="email" class="form-control" name="email" id="email" placeholder="Votre email" data-rule="email" data-msg="Entrer un email valide" />
+                  <div class="validate"></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" name="su" id="subject" placeholder="Sujet" data-rule="minlen:4" data-msg="Au moins 8 caractères" />
+                <div class="validate"></div>
+              </div>
+              <div class="form-group">
+                <textarea class="form-control" name="body" rows="5" data-rule="required" data-msg="Vous devez écrire quelque chose" placeholder="Message"></textarea>
+                <div class="validate"></div>
               </div>
               <div class="text-center"><button type="submit">Envoyer</button></div>
             </form>
-
           </div>
 
         </div>

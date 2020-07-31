@@ -22,6 +22,7 @@
   <link href="{{asset('assets/vendor/venobox/venobox.css')}}" rel="stylesheet">
   <link href="{{asset('assets/vendor/owl.carousel/assets/owl.carousel.min.css')}}" rel="stylesheet">
   <link href="{{asset('assets/vendor/aos/aos.css')}}" rel="stylesheet">
+  <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
   <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
@@ -55,8 +56,24 @@
   <script src="{{asset('assets/vendor/isotope-layout/isotope.pkgd.min.js')}}"></script>
   <script src="{{asset('assets/vendor/owl.carousel/owl.carousel.min.js')}}"></script>
   <script src="{{asset('assets/vendor/aos/aos.js')}}"></script>
+  
 		@yield('script')
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+  <script>
+  @if(Session::has('message'))
+    var type="{{Session::get('alert-type','info')}}"
+    if(type=='error')
+    {
+       toastr.error("{{ Session::get('message') }}");
+    }
+   else
+   {
+      toastr.info("{{ Session::get('message') }}");
+   }
+         
 
+  @endif
+</script>
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 	</body>

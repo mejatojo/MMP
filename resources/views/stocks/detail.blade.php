@@ -58,7 +58,7 @@
                   </div>
 		                <tr style="">
 		                  <td>{{$entree->quantite}}</td>
-		                  <td>{{$entree->date}}</td>
+		                  <td>{{date('d/m/Y',strtotime($entree->date))}}</td>
                       <td>{{$entree->source}}</td>
                       <td>
                         <a  type="button" class="btn btn-warning"  data-toggle="modal" data-target="#modal{{$entree->ide}}">
@@ -127,7 +127,7 @@
                   </div>
                     <tr style="">
                       <td>{{$sortie->quantite}}</td>
-                      <td>{{$sortie->date}}</td>
+                      <td>{{date('d/m/Y',strtotime($sortie->pose))}}</td>
                       <td>{{$sortie->source}}</td>
                       <td>
                         <a  type="button" class="btn btn-warning"  data-toggle="modal" data-target="#modal{{$sortie->ide}}">

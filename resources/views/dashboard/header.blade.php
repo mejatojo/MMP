@@ -89,15 +89,23 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-               @if(Auth::user()->role=='responsable')
+               @if(Auth::user()->role=='responsable' or Auth::user()->role=='PDG')
             <li class="nav-item">
               <a href="/home" class="nav-link">
                 <i class="far  fa-handshake"></i>
                 <p>Flotte de {{Auth::user()->entreprise}}</p>
               </a>
-              @endif
           </li>
-          @if(Auth::user()->role!='operateur')
+              @endif
+               @if(Auth::user()->role=='responsable' or Auth::user()->role=='PDG' or Auth::user()->role=='conducteur')
+            <li class="nav-item">
+              <a href="/vehicules" class="nav-link">
+                <i class="nav-icon fa fa-car"></i>
+                <p>Véhicules</p>
+              </a>
+          </li>
+              @endif
+          @if(Auth::user()->role=='superadmin')
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fa fa-car"></i>
@@ -107,7 +115,7 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
-              @if(Auth::user()->role=='conducteur' or Auth::user()->role=='responsable')
+              @if(Auth::user()->role=='conducteur' or Auth::user()->role=='responsable' or Auth::user()->role=='PDG')
               <li class="nav-item">
                 <a href="/vehicules" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -117,41 +125,57 @@
               @elseif(Auth::user()->role=='superadmin')
               <li class="nav-item">
                 <a href="/vehicules/create" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fa fa-plus"></i>
                   <p>Ajouter</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="/vehicules" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fa fa-list"></i>
                   <p>Liste</p>
                 </a>
               </li>
               @endif
             </ul>
           </li>
-             <li class="nav-item has-treeview">
+          @endif
+          @if(Auth::user()->role=='superadmin')
+          <li class="nav-item">
+                <a href="/rendezVous" class="nav-link">
+                  <i class="fas fa-handshake"></i>
+                  <p>Rendez-vous
+                    @if(isset($nbRdv))
+                      ({{$nbRdv}})
+                    @endif
+                  </p>
+                </a>
+              </li>
+          @elseif(Auth::user()->role=='conducteur' or Auth::user()->role=='responsable' or Auth::user()->role=='PDG')
+          <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-handshake"></i>
               <p>
-                Rendez-vous
+                Rendez-vous 
+                @if(Auth::user()->role=='superadmin')
+                @if(isset($nbRdv))
+                  ({{$nbRdv}})
+                @endif
+                @endif
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
-              @if(Auth::user()->role=='responsable')
+              @if(Auth::user()->role=='responsable' or Auth::user()->role=='conducteur' or Auth::user()->role=='PDG')
               <li class="nav-item">
                 <a href="/rendezVous/create" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Ajouter</p>
                 </a>
               </li>
-              @endif
-              @if(Auth::user()->role=='conducteur' or Auth::user()->role=='responsable')
               <li class="nav-item">
                 <a href="/rendezVous/liste/" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Listes</p>
+                  <p>Liste</p>
                 </a>
               </li>
               @endif
@@ -178,27 +202,26 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="/maintenances" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Rendez vous d'aujourd'hui</p>
+                  <i class="nav-icon far fa-circle text-danger"></i>
+                  <p>Rendez-vous d'aujourd'hui</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="/maintenancesRapides" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="nav-icon far fa-circle text-warning"></i>
                   <p>Intervention rapide</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="/historiques" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="nav-icon far fa-circle text-info"></i>
                   <p>Historique</p>
                 </a>
               </li>
             </ul>
           </li>
               @endif
-             
-              @if(Auth::user()->role=='superadmin')
+              @if(Auth::user()->role=='superadmin' or Auth::user()->role=='PDG' or Auth::user()->role=='responsable')
               <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fa fa-table"></i>
@@ -208,7 +231,7 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <a href="/utiliser" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Pneus utilisés</p>
@@ -219,15 +242,29 @@
                   <i class="far fa-circle nav-icon"></i>
                   <p>Gestion des coûts</p>
                 </a>
-              </li> 
+              </li>  -->
               <li class="nav-item">
                 <a href="/possession" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Coût de possession</p>
+                  <i class="fa fa-euro-sign nav-icon"></i>
+                  <p>Gestion de coûts</p>
+                </a>
+              </li> 
+              <li class="nav-item">
+                <a href="/pneuUse" class="nav-link">
+                  <i class="fa fa-times-circle nav-icon"></i>
+                  <p>Pneus usés</p>
                 </a>
               </li> 
             </ul>
           </li>
+          <li class="nav-item">
+                <a href="/entreprises" class="nav-link">
+                  <i class="fa fa-building"></i>
+                  <p>Entreprises</p>
+                </a>
+              </li>
+          @endif
+          @if(Auth::user()->role=='superadmin')
               <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fa fa-user"></i>
@@ -239,24 +276,19 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="/utilisateurs/create" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fa fa-user-plus nav-icon"></i>
                   <p>Ajouter</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="/utilisateurs" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fa fa-users nav-icon"></i>
                   <p>Liste</p>
                 </a>
               </li>
             </ul>
           </li>
-          <li class="nav-item">
-                <a href="/entreprises" class="nav-link">
-                  <i class="fa fa-building"></i>
-                  <p>Entreprises</p>
-                </a>
-              </li>
+          
               <li class="nav-item">
                 <a href="/stocks" class="nav-link">
                   <i class="fa fa-archive"></i>
@@ -265,12 +297,18 @@
               </li>
            <li class="nav-item">
                 <a href="/sauvegarde" class="nav-link">
-                  <i class="fad fa-database"></i>
-                  <p>Sauvegarde</p>
+                  <i class="fa fa-database"></i>
+                  <p>Sauvegarder/Restaurer</p>
                 </a>
               </li>
+               <li class="nav-item">
+                <a href="/story" class="nav-link">
+                  <i class="fa fa-history"></i>
+                  <p>Historiques des alertes</p>
+                </a>
+              </li> 
           @endif
-           @if(Auth::user()->role=='superadmin' or Auth::user()->role=='responsable')
+           @if(Auth::user()->role=='superadmin' or Auth::user()->role=='responsable' or Auth::user()->role=='conducteur' or Auth::user()->role=='PDG')
                <li class="nav-item">
                 <a href="/prediction" class="nav-link">
                   <i class="fa fa-arrow-alt-circle-right"></i>

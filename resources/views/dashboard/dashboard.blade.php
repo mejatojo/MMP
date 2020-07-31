@@ -28,8 +28,9 @@
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
   <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
 <style type="text/css">
-  th,.card-header{
+  th,.card-header{ 
   text-transform: uppercase;
+  text-align: center;
 }
 /*.btn-primary,.ajout{
   background: #BDB76B;
@@ -91,13 +92,15 @@
     </section>
   </div>
   <!-- /.content-wrapper -->
-  <!-- <footer class="main-footer">
-    <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
-    All rights reserved.
+  <footer class="main-footer">
+    <!-- <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
+    All rights reserved. -->
+    <strong>Maintenance Mobile des Pneumatiques</strong>
     <div class="float-right d-none d-sm-inline-block">
-      <b>Version</b> 3.0.4
+      Administrateur : <b><a href="https://mail.google.com/mail/u/0/?view=cm&fs=1&to=contactmmp06@gmail.com&tf=1&body=Le {{Auth::user()->role}} de l'entreprise {{Auth::user()->entreprise}}&subject=jjjjj">contactmmp06@gmail.com</a> | <a href="tel:06 82 41 86 92">06 82 41 86 92</a></b> 
+      <!-- <a href="https://mail.google.com/mail/?view=cm&fs=1&to=someone@example.com&su=SUBJECT&body=BODY&bcc=someone.else@example.com">i</a> -->
     </div>
-  </footer> -->
+  </footer>
 
   <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark">

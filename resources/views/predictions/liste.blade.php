@@ -9,6 +9,50 @@
     }
     
   </style>
+  <style type="text/css">
+    .tableau
+    {
+    border: 1px solid black;
+    }
+    .ty {
+  position: relative;
+/*  display: inline-block;
+ border-bottom: 1px dotted black;*/ 
+}
+
+.ty .tytext {
+  visibility: hidden;
+  background-color: white;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 125%;
+  right: : 300%;
+  margin-right: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.ty .tytext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.ty:hover .tytext {
+  visibility: visible;
+  opacity: 1;
+}
+  </style>
+
 @endsection
 @section('content')
 <div class="card col-12">
@@ -18,27 +62,29 @@
                 @csrf
                 <div class="form-group row">
                 <input type="date" class="form-control col-2" name="date">
-                <button class="btn btn-primary col-1">Valider</button>
+                <button class="btn btn-primary col-3">Valider</button>
               </div>
               </form> 
               @if(!isset($datefin) or $datefin<(date('Y-m-d')))
               <table id="example1" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                  <th>Immatriculation</th>
-                  <th>Entreprise</th>
-                  <th>Données initiales</th>
-                  <th>Données Finales</th>
-                  <th>Prédiction<BR> hauteur de gomme</th>
-                  <th>Permutation</th>
-                  <th>Pression</th>
-                  @if(Auth::user()->role=='superadmin')
-                  <th>Action</th>
+                  <th>Immatriculation :</th>
+                  <th>Marque :</th>
+                  <th>Modele :</th>
+                  @if(Auth::user()->role=="superadmin")
+                  <th>Entreprise  :</th>
                   @endif
+                  <th>Dernières données  (hauteur de gomme/ distance parcourue) :</th>
+                  <th id="gg">Prochain changement de pneus :</th>
+                 <!--  <th>Permutation</th> -->
+                  <!-- <th>Pression</th> -->
+                  <th>Action :</th>
                 </tr>
                 </thead>
                 <tbody>
                     @foreach($vehicules as $vehicule)
+
                     <div class="modal fade" id="alert{{$vehicule->id}}" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
                       <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -52,7 +98,7 @@
                             <form method="post" action="{{route('predictions.alert')}}">
                               @csrf
                               <input type="text" name="id" value="{{$vehicule->id}}" hidden>
-                              <textarea class="form-control" name="texte" placeholder="Si vous mettez rien, on envoie un message par défaut"></textarea>
+                              <textarea class="form-control" name="texte" placeholder="Si vous laisser ce champs vide,il enverra un message par défaut"></textarea>
                               <button class="btn btn-primary">Alerter</button>
                             </form>
                           </div>
@@ -62,166 +108,398 @@
                     @if(isset(unserialize($vehicule->t1)[1]) and isset(unserialize($vehicule->t2)[1]))
                   <tr>
                       <td>{{$vehicule->immatriculation}}</td>
+                      <td>{{$vehicule->marque}}</td>
+                      <td>{{$vehicule->model}}</td>
+                      @if(Auth::user()->role=="superadmin")
                       <td>{{$vehicule->entreprise}}</td>
-                      <td width="320px">
-                        @if(count(unserialize($vehicule->t1))==8)
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[7]))}}
-                        @else
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[5]))}}
-                        @endif
-                          <div class="row" style="width: 9cm">
-                          @if(unserialize($vehicule->etatPneu)[0]<3)
+                      @endif
+                      <td>
+                        Dernier contrôle : {{date('d/m/Y',strtotime($vehicule->control))}}
+            <div class="ty" style="width: 15cm;">
+                <span class="tytext">
+                  @if($vehicule->etatPneu)
+                        <div class="row" style="width: 100%;">
+                          @if(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.4)
                           <div class="col-3"></div>
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t1)[0]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[0]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
                           <div class="col-3"></div>
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t1)[0]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">
+                  {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[1]<3)
+                          @if(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[1]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
+                          <div class="col-3"></div>
+                          @elseif(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[1]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t1)[1]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           <div class="col-3"></div>
                           @endif
                         </div>
-                        <div class="row" style="width: 9cm">
+                        <div class="row" style="width: 100%;">
                           @if(isset(unserialize($vehicule->etatPneu)[4]))
-                          @if(unserialize($vehicule->etatPneu)[4]<3)
-                            <div class="col-3 tableau" style="background: red">       
-                               {{unserialize($vehicule->t1)[4]}} mm<br>
-                            </div>
+                          @if(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: red">       
+                              {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                            @elseif(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[4]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
                             @else
-                            <div class="col-3 tableau" style="background: green">            
-                             {{unserialize($vehicule->t1)[4]}} mm<br>
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}}bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @else
                             <div class="col-3"></div> 
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[2]<3)
+                          @if(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t1)[2]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[2]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->t1)[2]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                            @if($reference->id==unserialize($vehicule->refPneus)[2])
+                              {{$reference->reference}}
+                            @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[3]<3)
+                          @if(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[3]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[3]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                            {{unserialize($vehicule->t1)[3]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @endif
                           @if(isset(unserialize($vehicule->etatPneu)[5]))
-                          @if(unserialize($vehicule->etatPneu)[5]<3)
+                          @if(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.4)
                             <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[5]}} mm<br>
+                              {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
-                            @else
-                            <div class="col-3 tableau" style="background: green">             
-                             {{unserialize($vehicule->t1)[5 ]}} mm<br>
+                          @elseif(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[5]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @else
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @endif
                         </div>
-                        Kilomètrage :
-                        @if(count(unserialize($vehicule->t2))==8)
-                            {{unserialize($vehicule->t1)[6]}} km
-                        @else
-                            {{unserialize($vehicule->t1)[4]}} km
                         @endif
-                      </td>
-                      <td width="320px">
-                        @if(count(unserialize($vehicule->t1))==8)
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t2)[7]))}}
-                        @else
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t2)[5]))}}
-                        @endif
-                          <div class="row" style="width: 9cm">
-                          @if(unserialize($vehicule->etatPneu)[0]<3)
+                </span>
+                        @if($vehicule->etatPneu)
+                        <div class="row">
+                          @if(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.4)
                           <div class="col-3"></div>
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t2)[0]}} mm<br>
+                          {{unserialize($vehicule->hGomme)[0]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[0]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[0]}} mm/
+                             @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @else
                           <div class="col-3"></div>
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t2)[0]}} mm<br>
+                          <div class="col-3 tableau" style="background: green"> 
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[1]<3)
+                          @if(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t2)[1]}} mm<br>
+                          {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
+                          <div class="col-3"></div>
+                          @elseif(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[1]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t2)[1]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           <div class="col-3"></div>
                           @endif
                         </div>
-                        <div class="row" style="width: 9cm">
+                        <div class="row">
                           @if(isset(unserialize($vehicule->etatPneu)[4]))
-                          @if(unserialize($vehicule->etatPneu)[4]<3)
+                          @if(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.4)
                             <div class="col-3 tableau" style="background: red">       
-                               {{unserialize($vehicule->t2)[4]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @elseif(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[4]>=$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                             </div>
                             @else
-                            <div class="col-3 tableau" style="background: green">            
-                             {{unserialize($vehicule->t2)[4]}} mm<br>
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[4]}} mm/
+                           @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @else
                             <div class="col-3"></div> 
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[2]<3)
+                          @if(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t2)[2]}} mm<br>
+                          {{unserialize($vehicule->hGomme)[2]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[2]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[2]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->t2)[2]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[2]}} mm/
+                           @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[3]<3)
+                          @if(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t2)[3]}} mm<br>
+                          {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[3]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                            {{unserialize($vehicule->t2)[3]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @endif
                           @if(isset(unserialize($vehicule->etatPneu)[5]))
-                          @if(unserialize($vehicule->etatPneu)[5]<3)
+                          @if(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.4)
                             <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t2)[5]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                             @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @elseif(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[5]>=$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                             </div>
                             @else
-                            <div class="col-3 tableau" style="background: green">             
-                             {{unserialize($vehicule->t2)[5 ]}} mm<br>
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[5]}} mm/
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @endif
                         </div>
-                        Kilomètrage :
-                        @if(count(unserialize($vehicule->t2))==8)
-                            {{unserialize($vehicule->t2)[6]}} km
-                        @else
-                            {{unserialize($vehicule->t2)[4]}} km
                         @endif
+                    </div>
                       </td>
-                      <td width="340px">
                         @if(count(unserialize($vehicule->t2))==8)
                         <span hidden>{{$diff=(strtotime(unserialize($vehicule->t2)[7])-strtotime(unserialize($vehicule->t1)[7]))/86400}}
                           {{$dated=$vehicule->control}}
@@ -244,310 +522,476 @@
                         @while($stop!=1)
                           @for($i=0;$i<count(unserialize($vehicule->hGomme));$i++)
                             {{$tab[$i]=$tab[$i]-(unserialize($vehicule->t1)[$i]-unserialize($vehicule->t2)[$i])/$diff}}
-                            @if($tab[$i]<1.6)
+                            @if($tab[$i]<$vehicule->limiteHg)
                               {{$stop=1}}
                             @endif
                           @endfor
                           {{$count++}}
+                          @if($count>1000)
+                          {{$stop=1}}
+                          @endif
                         @endwhile
                         {{$nbPneu=0}}
                         @for($i=0;$i<count(unserialize($vehicule->hGomme));$i++)
-                            @if($tab[$i]<1.6)
+                            @if($tab[$i]<$vehicule->limiteHg)
                             {{$nbPneu++}}
                             @endif
-                        @endfor
+                        @endfor 
                         </span>
 
                           <span hidden><!-- {{$difference=((strtotime($datec)-strtotime($dated))/86400)}} -->
                             {{$dateprevu=date('y-m-d',strtotime($datec)+86400*$count)}}
                           {{$countAu=(strtotime($dateprevu)-strtotime(date('y-m-d')))/86400}}</span>
-                        Dans {{$countAu}} jours soit le {{date('d/m/Y',strtotime($dateprevu))}}<br>
-                        {{$nbPneu}} pneus à remplacer
-                        <div class="row" style="width: 9cm">
-                          @if(unserialize($vehicule->etatPneu)[0]<3)
-                          <div class="col-3"></div>
-                          <div class="col-3 tableau" style="background: red">       
-                            {{round($tab[0],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[0]-unserialize($vehicule->t2)[0])/$diff,2)}}mm/j
-                          </div>
+                      <td width="340px">
+                        <span hidden>{{$count/1000}}</span>
+                          @if($count>1000)
+                          Non disponible (on n'a qu'une donnée)
                           @else
-                          <div class="col-3"></div>
-                          <div class="col-3 tableau" style="background: green">               
-                           {{round($tab[0],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[0]-unserialize($vehicule->t2)[0])/$diff,2)}}mm/j
-                          </div>
+                           @if($countAu<=0) 
+                           <font color="red">
+                           Passé de {{abs(round($countAu))}} jours, {{$nbPneu}} pneus à remplacer
+                           soit le {{date('d/m/Y',strtotime($dateprevu))}}</font>
+                           @else
+                            {{$nbPneu}} pneus à remplacer dans {{abs(round($countAu))}} jours,
+                           soit le {{date('d/m/Y',strtotime($dateprevu))}}
+                           @endif
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[1]<3)
-                          <div class="col-3 tableau" style="background: red">       
-                             {{round($tab[1],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[1]-unserialize($vehicule->t2)[1])/$diff,2)}}mm/j
-                          </div>
-                          @else
-                          <div class="col-3 tableau" style="background: green">               
-                           {{round($tab[1],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[1]-unserialize($vehicule->t2)[1])/$diff,2)}}mm/j
-                          </div>
-                          <div class="col-3"></div>
-                          @endif
-                        </div>
-                        <div class="row" style="width: 9cm">
-                          @if(isset(unserialize($vehicule->etatPneu)[4]))
-                          @if(unserialize($vehicule->etatPneu)[4]<3)
-                            <div class="col-3 tableau" style="background: red">       
-                               {{round($tab[4],2)}} mm<br>
-                              {{round((unserialize($vehicule->t1)[4]-unserialize($vehicule->t2)[4])/$diff,2)}}mm/j
-                            </div>
-                            @else
-                            <div class="col-3 tableau" style="background: green">            
-                             {{round($tab[4],2)}} mm<br>
-                              {{round((unserialize($vehicule->t1)[4]-unserialize($vehicule->t2)[4])/$diff,2)}}mm/j
-                            </div>
-                            @endif
-                          @else
-                            <div class="col-3"></div> 
-                          @endif
-                          @if(unserialize($vehicule->etatPneu)[2]<3)
-                          <div class="col-3 tableau" style="background: red">       
-                            {{round($tab[2],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[2]-unserialize($vehicule->t2)[2])/$diff,2)}}mm/j
-                          </div>
-                          @else
-                          <div class="col-3 tableau" style="background: green">                  
-                            {{round($tab[2],2)}} mm<br>
-                              {{round((unserialize($vehicule->t1)[2]-unserialize($vehicule->t2)[2])/$diff,2)}}mm/j
-                          </div>
-                          @endif
-                          @if(unserialize($vehicule->etatPneu)[3]<3)
-                          <div class="col-3 tableau" style="background: red">       
-                            {{round($tab[3],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[3]-unserialize($vehicule->t2)[3])/$diff,2)}}mm/j
-                          </div>
-                          @else
-                          <div class="col-3 tableau" style="background: green">               
-                            {{round($tab[3],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[3]-unserialize($vehicule->t2)[3])/$diff,2)}}mm/j
-                          </div>
-                          @endif
-                          @if(isset(unserialize($vehicule->etatPneu)[5]))
-                          @if(unserialize($vehicule->etatPneu)[5]<3)
-                            <div class="col-3 tableau" style="background: red">       
-                              {{round($tab[5],2)}} mm<br>
-                             {{round((unserialize($vehicule->t1)[5]-unserialize($vehicule->t2)[5])/$diff,2)}}mm/j
-                            </div>
-                            @else
-                            <div class="col-3 tableau" style="background: green">             
-                              {{round($tab[5],2)}} mm<br>
-                               {{round((unserialize($vehicule->t1)[5]-unserialize($vehicule->t2)[5])/$diff,2)}}mm/j
-                            </div>
-                            @endif
-                          @endif
-                        </div> 
-                      </td>
-                      <td>
-                        Permutation dans
-                         @if(count(unserialize($vehicule->t2))==8)
-                        <!-- {{round(unserialize($vehicule->t2)[6]-(((unserialize($vehicule->t1)[6]-unserialize($vehicule->t2)[6])/$diff))*$difference,2)}} km -->
-                        <span hidden>
-                          {{$k=$vehicule->permutation}}
-                          {{$countk=0}}
-                          @while($k>0)
-                          {{$k=$k-(unserialize($vehicule->t2)[6]-unserialize($vehicule->t1)[6])/$diff}}
-                          {{$countk++}}
-                          @endwhile
-                          {{$dateprevuk=date('y-m-d',strtotime($datec)+86400*$countk)}}
-                          {{$countAuk=(strtotime($dateprevuk)-strtotime(date('y-m-d')))/86400}}
-                        </span>
-                        {{$countAuk}} jours soit le
-                        {{date('d/m/Y',strtotime($dateprevuk))}}<br>
-                          ({{round((unserialize($vehicule->t2)[6]-unserialize($vehicule->t1)[6])/$diff,2)}}
-                           km/j)
-                       @else
-                       <span hidden>
-                          {{$k=$vehicule->permutation}}
-                          {{$countk=0}}
-                          @while($k>0)
-                          {{$k=$k-(unserialize($vehicule->t2)[4]-unserialize($vehicule->t1)[4])/$diff}}
-                          {{$countk++}}
-                          @endwhile
-                           {{$dateprevuk=date('y-m-d',strtotime($datec)+86400*$countk)}}
-                          {{$countAuk=(strtotime($dateprevuk)-strtotime(date('y-m-d')))/86400}}
-                        </span>
-                        {{$countAuk}} j ou
-                        {{date('d/m/Y',strtotime($dateprevuk))}}<br>
-                         ({{round((unserialize($vehicule->t2)[4]-unserialize($vehicule->t1)[4])/$diff,2)}} km/j)
-                       @endif
-
-                      </td>
-                      <td>
-                        <!-- <span hidden>
-                          {{$inf=20}}
-                          @for($i=0;$i<count(unserialize($vehicule->etatPneu));$i++)
-                            @if(unserialize($vehicule->etatPneu)[$i]<$inf)
-                              {{$inf=unserialize($vehicule->etatPneu)[$i]}}
-                            @endif
-                          @endfor
-                          {{$countp=((3-$inf)/-0.1)*30}}
-                          {{$dateprevup=date('y-m-d',strtotime($datec)+86400*$countp)}}
-                          {{$countAup=(strtotime($dateprevup)-strtotime(date('y-m-d')))/86400}}
-                        </span>
-                        @if($countAup<0)
-                        Pression dans  {{abs($countAup)}} jours passés soit le 
-                        @else
-                        Pression dans  {{abs($countAup)}} jours soit le
-                        @endif
-                        {{date('d/m/Y',strtotime($dateprevup))}} -->
-                        Dans {{$countP=30-(strtotime(date('Y-m-d'))-strtotime($vehicule->derniereMaintenance))/86400}} jours
                       </td>
                       @if(Auth::user()->role=='superadmin')
                       <td>
-                        @if($vehicule->alertP==0)
                          <a  type="button" class="btn btn-danger" data-toggle="modal" data-target="#alert{{$vehicule->id}}">
                           Alerter
                </a>      
-                        @else
-                        <button type="button" class="btn btn-danger" disabled="true">
-                          Alerter
-                        </button>
-                        @endif
+                       
                       </td>
                       @endif
+                      @if(Auth::user()->role!="superadmin")
+                          <td>
+                          <a type="button" class="btn btn-info" href="rendezVous/{{$vehicule->id}}">
+                            Prendre un rendez-vous
+                          </a>
+                          </td>
+                          @endif
                   </tr>
                   @elseif(isset(unserialize($vehicule->t1)[1]) and !isset(unserialize($vehicule->t2)[1]))
                     <tr>
                       <td>{{$vehicule->immatriculation}}</td>
+                      <td>{{$vehicule->marque}}</td>
+                      <td>{{$vehicule->model}}</td>
+                      @if(Auth::user()->role=="superadmin")
                       <td>{{$vehicule->entreprise}}</td>
-                      <td>{{date('d/m/Y',strtotime($vehicule->dateC))}}
-                        <br>Kilomètrage : 0 km
-                      </td>
-                      <td>{{date('d/m/Y',strtotime($vehicule->control))}}
-                        <br>Kilomètrage : {{$vehicule->kilometrage}} km</td>
-                        <td>@if(count(unserialize($vehicule->t1))==8)
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[7]))}}
-                        @else
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[5]))}}
-                        @endif
-                          <div class="row" style="width: 9cm">
-                          @if(unserialize($vehicule->etatPneu)[0]<3)
+                      @endif
+                      <td>
+                        Dernier contrôle : {{date('d/m/Y',strtotime($vehicule->control))}}
+            <div class="ty" style="width: 15cm;">
+                <span class="tytext">
+                  @if($vehicule->etatPneu)
+                        <div class="row" style="width: 100%;">
+                          @if(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.4)
                           <div class="col-3"></div>
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t1)[0]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[0]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
                           <div class="col-3"></div>
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t1)[0]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">
+                  {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[1]<3)
+                          @if(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[1]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
+                          <div class="col-3"></div>
+                          @elseif(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[1]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t1)[1]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           <div class="col-3"></div>
                           @endif
                         </div>
-                        <div class="row" style="width: 9cm">
+                        <div class="row" style="width: 100%;">
                           @if(isset(unserialize($vehicule->etatPneu)[4]))
-                          @if(unserialize($vehicule->etatPneu)[4]<3)
-                            <div class="col-3 tableau" style="background: red">       
-                               {{unserialize($vehicule->t1)[4]}} mm<br>
-                            </div>
+                          @if(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: red">       
+                              {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                            @elseif(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[4]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
                             @else
-                            <div class="col-3 tableau" style="background: green">            
-                             {{unserialize($vehicule->t1)[4]}} mm<br>
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}}bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @else
                             <div class="col-3"></div> 
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[2]<3)
+                          @if(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t1)[2]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[2]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->t1)[2]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                            @if($reference->id==unserialize($vehicule->refPneus)[2])
+                              {{$reference->reference}}
+                            @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[3]<3)
+                          @if(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[3]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[3]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                            {{unserialize($vehicule->t1)[3]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @endif
                           @if(isset(unserialize($vehicule->etatPneu)[5]))
-                          @if(unserialize($vehicule->etatPneu)[5]<3)
+                          @if(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.4)
                             <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[5]}} mm<br>
+                              {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
-                            @else
-                            <div class="col-3 tableau" style="background: green">             
-                             {{unserialize($vehicule->t1)[5 ]}} mm<br>
+                          @elseif(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[5]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @else
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @endif
-                        </div></td>
-                        <td>
-                          
-                          <span hidden>
-                            @if(count(unserialize($vehicule->t1))==8)
-                            {{$isa=(strtotime(unserialize($vehicule->t1)[7])-strtotime($vehicule->dateC))/86400}}
-                            {{$kj=unserialize($vehicule->t1)[6]/$isa}}
-
-                            @elseif(count(unserialize($vehicule->t1))==6)
-                            {{$isa=(strtotime(unserialize($vehicule->t1)[5])-strtotime($vehicule->dateC))/86400}}
-                            {{$kj=unserialize($vehicule->t1)[4]/$isa}}
-                            @endif
-                            {{$p=$vehicule->permutation}}
-                            {{$count=0}}
-                          @while($p>0)
-                            {{$p=$p-$kj}}
-                            {{$count++}}
-                          @endwhile
-                            {{$dateprevuk=date('y-m-d',strtotime($vehicule->control)+86400*$count)}}
-                            {{$countAuk=(strtotime($dateprevuk)-strtotime(date('y-m-d')))/86400}}
-                          </span>
-                          Dans {{$countAuk}} jours soit le {{date('d/m/Y',strtotime($dateprevuk))}}
-                          ({{round($kj)}} km / jour)
-                        </td>
-                        <td>
-                       <!-- <span hidden>
-                           {{$inf=20}}
-                          @for($i=0;$i<count(unserialize($vehicule->etatPneu));$i++)
-                            @if(unserialize($vehicule->etatPneu)[$i]<$inf)
-                              {{$inf=unserialize($vehicule->etatPneu)[$i]}}
-                            @endif
-                          @endfor
-                          {{$countp=((3-$inf)/-0.1)*30}}
-                          {{$dateprevup=date('y-m-d',strtotime($vehicule->control)+86400*$countp)}}
-                          {{$countAup=(strtotime($dateprevup)-strtotime(date('y-m-d')))/86400}}
-                        </span>
-                        @if($countAup<0)
-                        Pression dans  {{abs($countAup)}} jours passés soit le
-                        @else
-                        Pression dans  {{abs($countAup)}} jours soit le
+                        </div>
                         @endif
-                        {{date('d/m/Y',strtotime($dateprevup))}} -->
-                        Dans {{$countP=30-(strtotime(date('Y-m-d'))-strtotime($vehicule->derniereMaintenance))/86400}} jours
+                </span>
+                        @if($vehicule->etatPneu)
+                        <div class="row">
+                          @if(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.4)
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: red">       
+                          {{unserialize($vehicule->hGomme)[0]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[0]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[0]}} mm/
+                             @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @else
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: green"> 
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @endif
+                          @if(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: red">       
+                          {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
+                          @elseif(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[1]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
+                          @else
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
+                          @endif
+                        </div>
+                        <div class="row">
+                          @if(isset(unserialize($vehicule->etatPneu)[4]))
+                          @if(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: red">       
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @elseif(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[4]>=$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @else
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[4]}} mm/
+                           @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @endif
+                          @else
+                            <div class="col-3"></div> 
+                          @endif
+                          @if(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: red">       
+                          {{unserialize($vehicule->hGomme)[2]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[2]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[2]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @else
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[2]}} mm/
+                           @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @endif
+                          @if(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: red">       
+                          {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[3]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @else
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @endif
+                          @if(isset(unserialize($vehicule->etatPneu)[5]))
+                          @if(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: red">       
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                             @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @elseif(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[5]>=$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @else
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[5]}} mm/
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @endif
+                          @endif
+                        </div>
+                        @endif
+                    </div>
                       </td>
+                        <td>Non disponible (on n'a qu'une donnée)<br>
+                          <!-- @if(count(unserialize($vehicule->t1))==8)
+                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[7]))}}
+                        @else
+                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[5]))}}
+                        @endif -->
+                        
+                      
+                      
+                       
                       @if(Auth::user()->role=='superadmin')
                         <td>
-                        @if($vehicule->alertP==0)
                         <a  type="button" class="btn btn-danger" data-toggle="modal" data-target="#alert{{$vehicule->id}}">
                           Alerter
                </a> 
-                        @else
-                        <button type="button" class="btn btn-danger" disabled="true">
-                          Alerter
-                         </button>
-                        @endif
                       </td>
                       @endif
+                      @if(Auth::user()->role!="superadmin")
+                          <td>
+                          <a type="button" class="btn btn-info" href="rendezVous/{{$vehicule->id}}">
+                            Prendre un rendez-vous
+                          </a>
+                          </td>
+                          @endif
                     </tr>
                      @endif
                      
@@ -560,16 +1004,17 @@
               <table id="example1" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                  <th>Immatriculation</th>
-                  <th>Entreprise</th>
-                  <th>Données initiales</th>
-                  <th>Données Finales</th>
-                  <th>Prédiction hauteur de gomme</th>
-                  <th>Permutation</th>
-                  <th>Pression</th>
-                  @if(Auth::user()->role=='superadmin')
-                  <th>Action</th>
+                  <th>Immatriculation :</th>
+                  <th>Marque :</th>
+                  <th>Modele :</th>
+                  @if(Auth::user()->role=="superadmin")
+                  <th>Entreprise : </th>
                   @endif
+                  <th>Dernières données  (hauteur de gomme/ distance parcourue) :</th>
+                  <th>Prédiction hauteur de gomme :</th>
+                  <!-- <th>Permutation</th> -->
+                  <!-- <th>Pression</th> -->
+                  <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -577,166 +1022,398 @@
                     @if(isset(unserialize($vehicule->t1)[1]) and isset(unserialize($vehicule->t2)[1]))
                   <tr>
                       <td>{{$vehicule->immatriculation}}</td>
+                      <td>{{$vehicule->marque}}</td>
+                      <td>{{$vehicule->model}}</td>
+                      @if(Auth::user()->role=="superadmin")
                       <td>{{$vehicule->entreprise}}</td>
-                      <td width="300px">
-                        @if(count(unserialize($vehicule->t1))==8)
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[7]))}}
-                        @else
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[5]))}}
-                        @endif
-                          <div class="row" style="width: 9cm">
-                          @if(unserialize($vehicule->etatPneu)[0]<3)
+                      @endif
+                       <td>
+                        Dernier contrôle : {{date('d/m/Y',strtotime($vehicule->control))}}
+            <div class="ty" style="width: 15cm;">
+                <span class="tytext">
+                  @if($vehicule->etatPneu)
+                        <div class="row" style="width: 100%;">
+                          @if(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.4)
                           <div class="col-3"></div>
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t1)[0]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[0]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
                           <div class="col-3"></div>
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t1)[0]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">
+                  {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[1]<3)
+                          @if(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[1]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
+                          <div class="col-3"></div>
+                          @elseif(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[1]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t1)[1]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           <div class="col-3"></div>
                           @endif
                         </div>
-                        <div class="row" style="width: 9cm">
+                        <div class="row" style="width: 100%;">
                           @if(isset(unserialize($vehicule->etatPneu)[4]))
-                          @if(unserialize($vehicule->etatPneu)[4]<3)
-                            <div class="col-3 tableau" style="background: red">       
-                               {{unserialize($vehicule->t1)[4]}} mm<br>
-                            </div>
+                          @if(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: red">       
+                              {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                            @elseif(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[4]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
                             @else
-                            <div class="col-3 tableau" style="background: green">            
-                             {{unserialize($vehicule->t1)[4]}} mm<br>
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}}bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @else
                             <div class="col-3"></div> 
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[2]<3)
+                          @if(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t1)[2]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[2]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->t1)[2]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                            @if($reference->id==unserialize($vehicule->refPneus)[2])
+                              {{$reference->reference}}
+                            @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[3]<3)
+                          @if(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[3]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[3]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                            {{unserialize($vehicule->t1)[3]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @endif
                           @if(isset(unserialize($vehicule->etatPneu)[5]))
-                          @if(unserialize($vehicule->etatPneu)[5]<3)
+                          @if(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.4)
                             <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[5]}} mm<br>
+                              {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
-                            @else
-                            <div class="col-3 tableau" style="background: green">             
-                             {{unserialize($vehicule->t1)[5 ]}} mm<br>
+                          @elseif(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[5]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @else
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @endif
                         </div>
-                        Kilomètrage :
-                        @if(count(unserialize($vehicule->t2))==8)
-                            {{unserialize($vehicule->t1)[6]}} km
-                        @else
-                            {{unserialize($vehicule->t1)[4]}} km
                         @endif
-                      </td>
-                      <td width="300px">
-                        @if(count(unserialize($vehicule->t1))==8)
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t2)[7]))}}
-                        @else
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t2)[5]))}}
-                        @endif
-                          <div class="row" style="width: 9cm">
-                          @if(unserialize($vehicule->etatPneu)[0]<3)
+                </span>
+                        @if($vehicule->etatPneu)
+                        <div class="row">
+                          @if(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.4)
                           <div class="col-3"></div>
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t2)[0]}} mm<br>
+                          {{unserialize($vehicule->hGomme)[0]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[0]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[0]}} mm/
+                             @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @else
                           <div class="col-3"></div>
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t2)[0]}} mm<br>
+                          <div class="col-3 tableau" style="background: green"> 
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[1]<3)
+                          @if(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t2)[1]}} mm<br>
+                          {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
+                          <div class="col-3"></div>
+                          @elseif(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[1]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t2)[1]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           <div class="col-3"></div>
                           @endif
                         </div>
-                        <div class="row" style="width: 9cm">
+                        <div class="row">
                           @if(isset(unserialize($vehicule->etatPneu)[4]))
-                          @if(unserialize($vehicule->etatPneu)[4]<3)
+                          @if(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.4)
                             <div class="col-3 tableau" style="background: red">       
-                               {{unserialize($vehicule->t2)[4]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @elseif(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[4]>=$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                             </div>
                             @else
-                            <div class="col-3 tableau" style="background: green">            
-                             {{unserialize($vehicule->t2)[4]}} mm<br>
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[4]}} mm/
+                           @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @else
                             <div class="col-3"></div> 
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[2]<3)
+                          @if(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t2)[2]}} mm<br>
+                          {{unserialize($vehicule->hGomme)[2]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[2]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[2]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->t2)[2]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[2]}} mm/
+                           @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[3]<3)
+                          @if(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t2)[3]}} mm<br>
+                          {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[3]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                            {{unserialize($vehicule->t2)[3]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                           </div>
                           @endif
                           @if(isset(unserialize($vehicule->etatPneu)[5]))
-                          @if(unserialize($vehicule->etatPneu)[5]<3)
+                          @if(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.4)
                             <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t2)[5]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                             @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @elseif(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[5]>=$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                             </div>
                             @else
-                            <div class="col-3 tableau" style="background: green">             
-                             {{unserialize($vehicule->t2)[5 ]}} mm<br>
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[5]}} mm/
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @endif
                         </div>
-                        Kilomètrage :
-                        @if(count(unserialize($vehicule->t2))==8)
-                            {{unserialize($vehicule->t2)[6]}} km
-                        @else
-                            {{unserialize($vehicule->t2)[4]}} km
                         @endif
+                    </div>
                       </td>
-                      <td width="340px">
                         @if(count(unserialize($vehicule->t2))==8)
                         <span hidden>{{$diff=(strtotime(unserialize($vehicule->t2)[7])-strtotime(unserialize($vehicule->t1)[7]))/86400}}
                           {{$dated=$vehicule->control}}
@@ -765,308 +1442,472 @@
                             @endif -->
                           @endfor
                           {{$count++}}
+                          @if($count>1000)
+                          {{$stop=1}}
+                          @endif
                         @endwhile
                         {{$nbPneu=0}}
                         @for($i=0;$i<count(unserialize($vehicule->hGomme));$i++)
-                            @if($tab[$i]<1.6)
+                            @if($tab[$i]<$vehicule->limiteHg)
                             {{$nbPneu++}}
                             @endif
                         @endfor
                         </span>
 
                           <span hidden><!-- {{$difference=((strtotime($datec)-strtotime($dated))/86400)}} -->
-                            {{$dateprevu=date('y-m-d',strtotime($datec)+86400*$count)}}
+                            {{$dateprevu=date('y-m-d',strtotime(date('y-m-d'))+86400*$count)}}
                           {{$countAu=(strtotime($dateprevu)-strtotime(date('y-m-d')))/86400}}</span>
-                        Dans {{$countAu}} jours soit le {{date('d/m/Y',strtotime($dateprevu))}}<br>
-                        {{$nbPneu}} pneus à remplacer
-                        <div class="row" style="width: 9cm">
-                          @if(unserialize($vehicule->etatPneu)[0]<3)
-                          <div class="col-3"></div>
-                          <div class="col-3 tableau" style="background: red">       
-                            {{round($tab[0],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[0]-unserialize($vehicule->t2)[0])/$diff,2)}}mm/j
-                          </div>
+                      <td width="340px">
+                        <span hidden>{{$count/1000}}</span>
+                          @if($count>1000)
+                            Non disponible (on n'a qu'une donnée)
                           @else
-                          <div class="col-3"></div>
-                          <div class="col-3 tableau" style="background: green">               
-                           {{round($tab[0],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[0]-unserialize($vehicule->t2)[0])/$diff,2)}}mm/j
-                          </div>
-                          @endif
-                          @if(unserialize($vehicule->etatPneu)[1]<3)
-                          <div class="col-3 tableau" style="background: red">       
-                             {{round($tab[1],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[1]-unserialize($vehicule->t2)[1])/$diff,2)}}mm/j
-                          </div>
-                          @else
-                          <div class="col-3 tableau" style="background: green">               
-                           {{round($tab[1],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[1]-unserialize($vehicule->t2)[1])/$diff,2)}}mm/j
-                          </div>
-                          <div class="col-3"></div>
-                          @endif
-                        </div>
-                        <div class="row" style="width: 9cm">
-                          @if(isset(unserialize($vehicule->etatPneu)[4]))
-                          @if(unserialize($vehicule->etatPneu)[4]<3)
-                            <div class="col-3 tableau" style="background: red">       
-                               {{round($tab[4],2)}} mm<br>
-                              {{round((unserialize($vehicule->t1)[4]-unserialize($vehicule->t2)[4])/$diff,2)}}mm/j
-                            </div>
-                            @else
-                            <div class="col-3 tableau" style="background: green">            
-                             {{round($tab[4],2)}} mm<br>
-                              {{round((unserialize($vehicule->t1)[4]-unserialize($vehicule->t2)[4])/$diff,2)}}mm/j
-                            </div>
-                            @endif
-                          @else
-                            <div class="col-3"></div> 
-                          @endif
-                          @if(unserialize($vehicule->etatPneu)[2]<3)
-                          <div class="col-3 tableau" style="background: red">       
-                            {{round($tab[2],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[2]-unserialize($vehicule->t2)[2])/$diff,2)}}mm/j
-                          </div>
-                          @else
-                          <div class="col-3 tableau" style="background: green">                  
-                            {{round($tab[2],2)}} mm<br>
-                              {{round((unserialize($vehicule->t1)[2]-unserialize($vehicule->t2)[2])/$diff,2)}}mm/j
-                          </div>
-                          @endif
-                          @if(unserialize($vehicule->etatPneu)[3]<3)
-                          <div class="col-3 tableau" style="background: red">       
-                            {{round($tab[3],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[3]-unserialize($vehicule->t2)[3])/$diff,2)}}mm/j
-                          </div>
-                          @else
-                          <div class="col-3 tableau" style="background: green">               
-                            {{round($tab[3],2)}} mm<br>
-                            {{round((unserialize($vehicule->t1)[3]-unserialize($vehicule->t2)[3])/$diff,2)}}mm/j
-                          </div>
-                          @endif
-                          @if(isset(unserialize($vehicule->etatPneu)[5]))
-                          @if(unserialize($vehicule->etatPneu)[5]<3)
-                            <div class="col-3 tableau" style="background: red">       
-                              {{round($tab[5],2)}} mm<br>
-                             {{round((unserialize($vehicule->t1)[5]-unserialize($vehicule->t2)[5])/$diff,2)}}mm/j
-                            </div>
-                            @else
-                            <div class="col-3 tableau" style="background: green">             
-                              {{round($tab[5],2)}} mm<br>
-                               {{round((unserialize($vehicule->t1)[5]-unserialize($vehicule->t2)[5])/$diff,2)}}mm/j
-                            </div>
-                            @endif
-                          @endif
-                        </div>
+                            @if($countAu<=0) 
+                             <font color="red">
+                             Passé de {{abs(round($countAu))}} jours, {{$nbPneu}} pneus à remplacer
+                             soit le {{date('d/m/Y',strtotime($dateprevu))}}</font>
+                             @else
+                              {{$nbPneu}} pneus à remplacer dans {{abs(round($countAu))}} jours
+                             soit le {{date('d/m/Y',strtotime($dateprevu))}}
+                             @endif<br>
+                           @endif
+                        
                       </td>
-                      <td>
-                         @if(count(unserialize($vehicule->t2))==8)
-                        <!-- {{round(unserialize($vehicule->t2)[6]-(((unserialize($vehicule->t1)[6]-unserialize($vehicule->t2)[6])/$diff))*$difference,2)}} km -->
-                        <span hidden>
-                          {{$k=$vehicule->kilometrage}}
-                          {{$countk=0}}
-                          @while($countk<$countdiff)
-                          {{$k=$k+(unserialize($vehicule->t2)[6]-unserialize($vehicule->t1)[6])/$diff}}
-                          {{$countk++}}
-                          @endwhile
-                          {{$dateprevuk=date('y-m-d',strtotime($datec)+86400*$countk)}}
-                          {{$countAuk=(strtotime($dateprevuk)-strtotime($datefin))/86400}}
-                        </span>
-                        {{date('d/m/Y',strtotime($datefin))}}<br>{{$k}} km<br>
-                          ({{round((unserialize($vehicule->t2)[6]-unserialize($vehicule->t1)[6])/$diff,2)}}
-                           km/j)
-                       @else
-                        <span hidden>
-                          {{$k=$vehicule->kilometrage}}
-                          {{$countk=0}}
-                          @while($countk<$countdiff)
-                          {{$k=$k+(unserialize($vehicule->t2)[4]-unserialize($vehicule->t1)[4])/$diff}}
-                          {{$countk++}}
-                          @endwhile
-                           {{$dateprevuk=date('y-m-d',strtotime($datec)+86400*$countk)}}
-                          {{$countAuk=(strtotime($dateprevuk)-strtotime($datefin))/86400}}
-                        </span>
-                        {{date('d/m/Y',strtotime($datefin))}}<br>{{$k}} km<br>
-                         ({{round((unserialize($vehicule->t2)[4]-unserialize($vehicule->t1)[4])/$diff,2)}} km/j)
-                       @endif
-
-                      </td>
-                      <td>
-                       <!--  <span hidden>
-                          {{$inf=20}}
-                          @for($i=0;$i<count(unserialize($vehicule->etatPneu));$i++)
-                            @if(unserialize($vehicule->etatPneu)[$i]<$inf)
-                              {{$inf=unserialize($vehicule->etatPneu)[$i]}}
-                            @endif
-                          @endfor
-                          {{$countp=((3-$inf)/-0.1)*30}}
-                          {{$dateprevup=date('y-m-d',strtotime($datec)+86400*$countp)}}
-                          {{$countAup=(strtotime($dateprevup)-strtotime($datefin))/86400}}
-                        </span>
-                        @if($countAup<0)
-                        Pression dans  {{abs($countAup)}} jours passés soit le
-                        @else
-                        Pression dans  {{abs($countAup)}} jours soit le
-                        @endif
-                        ({{date('d/m/Y',strtotime($dateprevup))}}) -->
-                        Dans {{$countP=30-(strtotime(date('Y-m-d'))-strtotime($vehicule->derniereMaintenance))/86400}} jours
+                     
                       </td>
                       @if(Auth::user()->role=='superadmin')
                       <td>
-                        @if($vehicule->alertP==0)
                          <a  type="button" class="btn btn-danger" data-toggle="modal" data-target="#alert{{$vehicule->id}}">
                           Alerter
                         </a>  
-                        @else
-                        <button type="button" class="btn btn-danger" disabled="true">
-                          Alerter
-                        </button>
-                        @endif
                       </td>
                       @endif
+                      @if(Auth::user()->role!="superadmin")
+                          <td>
+                          <a type="button" class="btn btn-info" href="rendezVous/{{$vehicule->id}}">
+                            Prendre un rendez-vous
+                          </a>
+                          </td>
+                          @endif
                   </tr>
                   @elseif(isset(unserialize($vehicule->t1)[1]) and !isset(unserialize($vehicule->t2)[1]))
                     <tr>
                       <td>{{$vehicule->immatriculation}}</td>
+                      <td>{{$vehicule->marque}}</td>
+                      <td>{{$vehicule->model}}</td>
+                      @if(Auth::user()->role=="superadmin")
                       <td>{{$vehicule->entreprise}}</td>
-                      <td>{{date('d/m/Y',strtotime($vehicule->dateC))}}
-                        <br>Kilomètrage : 0 km
-                      </td>
-                      <td>{{date('d/m/Y',strtotime($vehicule->control))}}
-                        <br>Kilomètrage : {{$vehicule->kilometrage}} km</td>
-                        <td>@if(count(unserialize($vehicule->t1))==8)
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[7]))}}
-                        @else
-                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[5]))}}
-                        @endif
-                          <div class="row" style="width: 9cm">
-                          @if(unserialize($vehicule->etatPneu)[0]<3)
+                      @endif
+                        <td>
+                        Dernier contrôle : {{date('d/m/Y',strtotime($vehicule->control))}}
+            <div class="ty" style="width: 15cm;">
+                <span class="tytext">
+                  @if($vehicule->etatPneu)
+                        <div class="row" style="width: 100%;">
+                          @if(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.4)
                           <div class="col-3"></div>
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t1)[0]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[0]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
                           <div class="col-3"></div>
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t1)[0]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">
+                  {{unserialize($vehicule->hGomme)[0]}} mm/
+                            {{unserialize($vehicule->etatPneu)[0]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[1]<3)
+                          @if(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[1]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
+                          <div class="col-3"></div>
+                          @elseif(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[1]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                           {{unserialize($vehicule->t1)[1]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[1]}} mm/
+                            {{unserialize($vehicule->etatPneu)[1]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           <div class="col-3"></div>
                           @endif
                         </div>
-                        <div class="row" style="width: 9cm">
+                        <div class="row" style="width: 100%;">
                           @if(isset(unserialize($vehicule->etatPneu)[4]))
-                          @if(unserialize($vehicule->etatPneu)[4]<3)
-                            <div class="col-3 tableau" style="background: red">       
-                               {{unserialize($vehicule->t1)[4]}} mm<br>
-                            </div>
+                          @if(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: red">       
+                              {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                            @elseif(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[4]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
                             @else
-                            <div class="col-3 tableau" style="background: green">            
-                             {{unserialize($vehicule->t1)[4]}} mm<br>
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[4]}} mm/
+                            {{unserialize($vehicule->etatPneu)[4]}}bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @else
                             <div class="col-3"></div> 
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[2]<3)
+                          @if(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                            {{unserialize($vehicule->t1)[2]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[2]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->t1)[2]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[2]}} mm/
+                            {{unserialize($vehicule->etatPneu)[2]}} bar<br>
+                            @foreach($references as $reference)
+                            @if($reference->id==unserialize($vehicule->refPneus)[2])
+                              {{$reference->reference}}
+                            @endif
+                            @endforeach
                           </div>
                           @endif
-                          @if(unserialize($vehicule->etatPneu)[3]<3)
+                          @if(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.4)
                           <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[3]}} mm<br>
+                            {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[3]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @else
-                          <div class="col-3 tableau" style="background: green">               
-                            {{unserialize($vehicule->t1)[3]}} mm<br>
+                          <div class="col-3 tableau" style="background: green">                   {{unserialize($vehicule->hGomme)[3]}} mm/
+                            {{unserialize($vehicule->etatPneu)[3]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                           </div>
                           @endif
                           @if(isset(unserialize($vehicule->etatPneu)[5]))
-                          @if(unserialize($vehicule->etatPneu)[5]<3)
+                          @if(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.4)
                             <div class="col-3 tableau" style="background: red">       
-                             {{unserialize($vehicule->t1)[5]}} mm<br>
+                              {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
-                            @else
-                            <div class="col-3 tableau" style="background: green">             
-                             {{unserialize($vehicule->t1)[5 ]}} mm<br>
+                          @elseif(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[5]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
+                          </div>
+                          @else
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[5]}} mm/
+                            {{unserialize($vehicule->etatPneu)[5]}} bar<br>
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$reference->reference}}
+                              @endif
+                            @endforeach
                             </div>
                             @endif
                           @endif
-                        </div></td>
-                        <td>
-                          <span hidden>
-                            @if($vehicule->kilometrage==0 and count(unserialize($vehicule->t1))==8)
-                            {{$isa=(strtotime($vehicule->control)-strtotime($vehicule->dateC))/86400}}:
-                            {{$jour=($isa*10000)/unserialize($vehicule->t1)[6]}}
-                            {{$parj=unserialize($vehicule->t1)[6]/$isa}}
-                             {{$dateper=date('y-m-d',strtotime($vehicule->control)+86400*$jour)}}
-                            {{$countPer=(strtotime($dateper)-strtotime($datefin))/86400}}
-                            {{$countPer=$countPer+(strtotime($vehicule->control)-strtotime(unserialize($vehicule->t1)[7]))/86400}}
-                            @elseif($vehicule->kilometrage==0 and count(unserialize($vehicule->t1))==6)
-                            {{$isa=(strtotime($vehicule->control)-strtotime($vehicule->dateC))/86400}}:
-                            {{$parj=unserialize($vehicule->t1)[4]/$isa}}
-                            {{$jour=($isa*10000)/unserialize($vehicule->t1)[4]}}
-                             {{$dateper=date('y-m-d',strtotime($vehicule->control)+86400*$jour)}}
-                            {{$countPer=(strtotime($dateper)-strtotime($datefin))/86400}}
-                            {{$countPer=$countPer+(strtotime($vehicule->control)-strtotime(unserialize($vehicule->t1)[5]))/86400}}
-                            @else
-                            {{$isa=(strtotime($vehicule->control)-strtotime($vehicule->dateC))/86400}}:
-                            {{$parj=$vehicule->kilometrage/$isa}}
-                            {{$jour=($isa*10000)/$vehicule->kilometrage}}{{$jour=$jour-$isa}}
-                             {{$dateper=date('y-m-d',strtotime($vehicule->control)+86400*$jour)}}
-                            {{$countPer=(strtotime($dateper)-strtotime($datefin))/86400}}
-
-                            @endif
-                          </span>
-                          {{date('d/m/Y',strtotime($datefin))}}<br>
-                          {{round(($parj*(strtotime($datefin)-strtotime($vehicule->control))/86400)+$vehicule->kilometrage)}} km 
-                          ({{round($parj)}} km/j)
-                        </td>
-                        <td>
-                       <!--  <span hidden>
-                          {{$inf=20}}
-                          @for($i=0;$i<count(unserialize($vehicule->etatPneu));$i++)
-                            @if(unserialize($vehicule->etatPneu)[$i]<$inf)
-                              {{$inf=unserialize($vehicule->etatPneu)[$i]}}
-                            @endif
-                          @endfor
-                          {{$countp=((3-$inf)/-0.1)*30}}
-                          {{$dateprevup=date('y-m-d',strtotime($vehicule->control)+86400*$countp)}}
-                          {{$countAup=(strtotime($dateprevup)-strtotime($datefin))/86400}}
-                        </span>
-                        @if($countAup<0)
-                        Pression dans  {{abs($countAup)}} jours passés soit le
-                        @else
-                        Pression dans  {{abs($countAup)}} jours soit le
+                        </div>
                         @endif
-                        ({{date('d/m/Y',strtotime($dateprevup))}}) -->
-                        Dans {{$countP=30-(strtotime(date('Y-m-d'))-strtotime($vehicule->derniereMaintenance))/86400}} jours
+                </span>
+                        @if($vehicule->etatPneu)
+                        <div class="row">
+                          @if(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.4)
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: red">       
+                          {{unserialize($vehicule->hGomme)[0]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[0]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[0]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[0]}} mm/
+                             @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @else
+                          <div class="col-3"></div>
+                          <div class="col-3 tableau" style="background: green"> 
+                            {{unserialize($vehicule->hGomme)[0]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[0])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @endif
+                          @if(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: red">       
+                          {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
+                          @elseif(unserialize($vehicule->hGomme)[1]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[1]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
+                          @else
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[1]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[1])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          <div class="col-3"></div>
+                          @endif
+                        </div>
+                        <div class="row">
+                          @if(isset(unserialize($vehicule->etatPneu)[4]))
+                          @if(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: red">       
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @elseif(unserialize($vehicule->hGomme)[4]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[4]>=$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[4]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @else
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[4]}} mm/
+                           @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[4])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @endif
+                          @else
+                            <div class="col-3"></div> 
+                          @endif
+                          @if(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: red">       
+                          {{unserialize($vehicule->hGomme)[2]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[2]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[2]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[2]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @else
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[2]}} mm/
+                           @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[2])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @endif
+                          @if(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: red">       
+                          {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @elseif(unserialize($vehicule->hGomme)[3]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[3]>=$vehicule->limiteHg+0.4)
+                          <div class="col-3 tableau" style="background: orange">        
+                          {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @else
+                          <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[3]}} mm/
+                            @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[3])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                          </div>
+                          @endif
+                          @if(isset(unserialize($vehicule->etatPneu)[5]))
+                          @if(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: red">       
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                             @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @elseif(unserialize($vehicule->hGomme)[5]<$vehicule->limiteHg+0.8 and unserialize($vehicule->hGomme)[5]>=$vehicule->limiteHg+0.4)
+                            <div class="col-3 tableau" style="background: orange">        
+                            {{unserialize($vehicule->hGomme)[5]}} mm/
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @else
+                            <div class="col-3 tableau" style="background: green">                 {{unserialize($vehicule->hGomme)[5]}} mm/
+                              @foreach($references as $reference)
+                              @if($reference->id==unserialize($vehicule->refPneus)[5])
+                                {{$vehicule->kilometrage-$reference->kInit}} km
+                              @endif
+                            @endforeach
+                            </div>
+                            @endif
+                          @endif
+                        </div>
+                        @endif
+                    </div>
+                      </td>
+                     <td>Non disponible (on n'a qu'une donnée)<br>
+                        <!-- @if(count(unserialize($vehicule->t1))==8)
+                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[7]))}}
+                        @else
+                          {{date('d/m/Y',strtotime(unserialize($vehicule->t1)[5]))}}
+                        @endif -->
+                        
                       </td>
                        @if(Auth::user()->role=='superadmin')
                         <td>
-                        @if($vehicule->alertP==0)
                         <a  type="button" class="btn btn-danger" data-toggle="modal" data-target="#alert{{$vehicule->id}}">
                           Alerter
                </a>
-                        @else
-                        <button type="button" class="btn btn-danger" disabled="true">
-                          Alerter
-               </button>
-                        @endif
+                       
                       </td>
                       @endif
+                      @if(Auth::user()->role!="superadmin")
+                          <td>
+                          <a type="button" class="btn btn-info" href="rendezVous/{{$vehicule->id}}">
+                            Prendre un rendez-vous
+                          </a>
+                          </td>
+                          @endif
                     </tr>
                      @endif
                      
@@ -1085,20 +1926,41 @@
 <script src="{{asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="{{asset('plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
 <script src="{{asset('plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
+  @if(Auth::user()->role=="superadmin")
 <script>
   $(function () {
     $("#example1").DataTable({
       "responsive": true,
       "autoWidth": false,
+      "order": [ 5, 'asc' ]
     });
   });
   $(function () {
     $("#example2").DataTable({
       "responsive": true,
-      "autoWidth": false,
+      "autoWidth": false, 
+      "order": [ 5, 'asc' ]
     });
   });
 </script>
+@else
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      "responsive": true,
+      "autoWidth": false,
+      "order": [ 4, 'asc' ]
+    });
+  });
+  $(function () {
+    $("#example2").DataTable({
+      "responsive": true,
+      "autoWidth": false, 
+      "order": [ 4, 'asc' ]
+    });
+  });
+</script>
+@endif
 
 
 

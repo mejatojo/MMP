@@ -25,7 +25,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                	@foreach($references as $reference)
+                	@foreach($vehicules as $vehicule)
+                    @if(isset(unserialize($vehicule->refPneus)[0]))
+                        @foreach($References as $Reference)
+                          @if($vehicule->id==$Reference->id_vehicule)
                   <div class="modal fade" id="modal{{$reference->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                       <div class="modal-content">

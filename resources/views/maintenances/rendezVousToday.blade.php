@@ -16,14 +16,14 @@
               <table id="example1" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                  <th>Immatriculation</th>
-                  <th>Modele</th>
-                  <th>marque</th>
-                  <th>Contact du responsable</th>
-                  <th>Entreprise</th>
-                  <th>Commentaire</th>
-                  <th>Heure</th>
-                  <th>Action</th>
+                  <th>Immatriculation :</th>
+                  <th>Modèle :</th>
+                  <th>marque :</th>
+                  <th>Contact du responsable :</th>
+                  <th>Entreprise :</th>
+                  <th>Commentaire :</th>
+                  <th>Heure :</th>
+                  <th>Action :</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -37,15 +37,9 @@
                       <td>{{$rdv->commentaire}}</td>
                       <td>{{$rdv->heure}}</td>
                       <td>
-                        @if($rdv->finished==0)
-                        <a href="/begin/{{$rdv->vehicule_id}}" class="btn btn-primary">
+                        <a href="/begin/{{$rdv->id}}" class="btn btn-primary">
                             Commencer
                         </a>
-                        @elseif($rdv->finished==1)
-                        <a href="/begin/{{$rdv->vehicule_id}}" class="btn btn-primary">
-                            Continuer
-                        </a>
-                        @endif
                     </td>
 		                </tr>	
 		            @endforeach															
@@ -67,6 +61,7 @@
     $("#example1").DataTable({
       "responsive": true,
       "autoWidth": false,
+      "order": [ 6, 'asc' ]
     });
 
     /*$('#example2').DataTable({

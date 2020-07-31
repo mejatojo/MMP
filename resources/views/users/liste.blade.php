@@ -16,7 +16,7 @@
                 <thead>
                 <tr>
                   <th>Nom</th>
-                  <th>Phone/email</th>
+                  <th>email/telephone</th>
                   <th>Entreprise</th>
                   <th>Actions</th>
                 </tr>
@@ -47,15 +47,16 @@
                       <td>{{$user->email}}/{{$user->phone}}</td>
                       <td>{{$user->entreprise}} ({{$user->role}})</td>
                       <td>
-                        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#exa{{$user->id}}" data-toggle="tooltip" data-placement="bottom" title="Modifier">
+                        <a href="find/{{$user->id}}" type="button" class="btn btn-warning"  data-toggle="tooltip" data-placement="bottom" title="Modifier">
                           <i class="fa fa-edit"></i>
-                        </button>
+                        </a>
                          <a  type="button" class="btn btn-danger" data-toggle="modal" data-target="#suprimer{{$user->id}}">
                           <i class="fa fa-trash-alt"></i>
                         </a> 
-                        <a type="button" class="btn btn-dark" data-toggle="tooltip" data-placement="bottom" title="Réinitialiser" href="utilisateurs/reinitialiser/{{$user->id}}">
+                        
+                        <!-- <a type="button" class="btn btn-dark" data-toggle="tooltip" data-placement="bottom" title="Réinitialiser" href="utilisateurs/reinitialiser/{{$user->id}}">
                           <i class="fa fa-redo-alt"></i>
-                        </a>
+                        </a> -->
                         <!-- Modal -->
                         <div class="modal fade" id="exa{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                           <div class="modal-dialog" role="document">
@@ -118,13 +119,50 @@
                                                           @if($user->role=="conducteur")
                                                           <option value="conducteur">Conducteur</option>
                                                           <option value="responsable">Responsable</option>
-                                                         @else
+                                                          <option value="PDG">PDG</option>
+                                                         @elseif($user->role=="responsable")
+                                                          <option value="responsable">Responsable</option>
+                                                          <option value="conducteur">Conducteur</option>
+                                                          <option value="PDG">PDG</option>
+                                                          @elseif($user->role=="PDG")
+                                                          <option value="PDG" selected>PDG</option>
                                                           <option value="responsable">Responsable</option>
                                                           <option value="conducteur">Conducteur</option>
                                                           @endif
                                                       </select>
-                                              </div>
-                                              </div>
+                                                  </div>
+                                                </div>
+
+
+
+                                              <div class="form-group row">
+                                                <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Rôle') }}</label>
+                                                <div class="col-md-6">
+                                                    <select class="form-control entreprise" name="role"  >
+                                                        <option value="conducteur">Conducteur</option>
+                                                        <option value="responsable">Responsable</option>
+                                                        <option value="PDG">PDG</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                             <div class="form-group row cResponsable" hidden="true" >
+                                                <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('Entreprise') }}</label>
+
+                                                <div class="col-md-6">
+                                                    <input  type="text" class="form-control createE @error('entreprise') is-invalid @enderror" name="entrepri" value="{{ old('entreprise') }}">
+
+                                                    @error('entreprise')
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $message }}</strong>
+                                                        </span>
+                                                    @enderror
+                                                </div>
+                                            </div>
+
+
+
+
                                               <div class="form-group row"  id="cConducteur">
                                                   <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Entreprise') }}</label>
                                                   <div class="col-md-6">
@@ -179,7 +217,30 @@
     });
   });
 </script>
-
+<script type="text/javascript">
+        var e=document.querySelector('#entreprise')
+        e.addEventListener('change',function(){
+            console.log(this.value)
+            if(this.value==='responsable')
+            {
+                document.querySelector('#choixE').value=null;
+                document.querySelector('#cConducteur').hidden=true;
+                document.querySelector('#cResponsable').hidden=false;
+            }
+            if(this.value==='conducteur')
+            {
+                document.querySelector('#createE').value=null;
+                document.querySelector('#cConducteur').hidden=false;
+                document.querySelector('#cResponsable').hidden=true;
+            }
+            if(this.value==='PDG')
+            {
+                document.querySelector('#createE').value=null;
+                document.querySelector('#cConducteur').hidden=false;
+                document.querySelector('#cResponsable').hidden=true;
+            }
+        })
+    </script>
 
 
 @endsection

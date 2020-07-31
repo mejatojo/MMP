@@ -16,7 +16,7 @@
                             <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Nom') }}</label>
 
                             <div class="col-md-6">
-                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
+                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{$vehicule[0]->nomH}}" required autocomplete="name" autofocus>
 
                                 @error('name')
                                     <span class="invalid-feedback" role="alert">
@@ -30,7 +30,7 @@
                             <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('Adresse email') }}</label>
 
                             <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
+                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{$vehicule[0]->emailH}}" required autocomplete="email">
 
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
@@ -44,7 +44,7 @@
                             <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('N° téléphone') }}</label>
 
                             <div class="col-md-6">
-                                <input id="phone" type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" required>
+                                <input id="phone" type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{$vehicule[0]->phoneH}}" required>
 
                                 @error('phone')
                                     <span class="invalid-feedback" role="alert">
@@ -59,10 +59,9 @@
                                 <select class="form-control" name="role" id="entreprise" >
                                     <option value="conducteur">Conducteur</option>
                                     <option value="responsable">Responsable</option>
-                                    <option value="PDG">PDG</option>
                                 </select>
-                            </div>
-                        </div> 
+                        </div>
+                        </div>
 
                          <div class="form-group row" hidden="true" id="cResponsable">
                             <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('Entreprise') }}</label>
@@ -81,9 +80,15 @@
                             <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Entreprise') }}</label>
                             <div class="col-md-6">
                                 <select class="form-control" name="entreprise" id="choixE">
-                                    <option value="null"></option>
                                     @foreach($entreprises as $entreprise)
+                                    @if($entreprise->entreprise==$vehicule[0]->entreprise)
+                                    <option value="{{$entreprise->entreprise}}">{{$entreprise->entreprise}}</option selected>
+                                    @endif
+                                    @endforeach
+                                    @foreach($entreprises as $entreprise)
+                                    @if($entreprise->entreprise!=$vehicule[0]->entreprise)
                                     <option value="{{$entreprise->entreprise}}">{{$entreprise->entreprise}}</option>
+                                    @endif
                                     @endforeach
                                 </select>
                         </div>
@@ -116,7 +121,6 @@
         <script type="text/javascript">
         var e=document.querySelector('#entreprise')
         e.addEventListener('change',function(){
-            console.log(this.value)
             if(this.value==='responsable')
             {
                 document.querySelector('#choixE').value=null;
@@ -124,12 +128,6 @@
                 document.querySelector('#cResponsable').hidden=false;
             }
             if(this.value==='conducteur')
-            {
-                document.querySelector('#createE').value=null;
-                document.querySelector('#cConducteur').hidden=false;
-                document.querySelector('#cResponsable').hidden=true;
-            }
-            if(this.value==='PDG')
             {
                 document.querySelector('#createE').value=null;
                 document.querySelector('#cConducteur').hidden=false;

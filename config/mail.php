@@ -1,7 +1,7 @@
 <?php
 
 return [
-
+ 
     /*
     |--------------------------------------------------------------------------
     | Default Mailer
@@ -83,8 +83,8 @@ return [
     */
 
     'from' => [
-        'address' => 'mejatojokantoniaina@gmail.com',
-        'name' => 'Meja',
+        'address' => 'contactmmp06@gmail.com',
+        'name' => 'Maintenance Mobile Pneumatique',
     ],
 
     /*

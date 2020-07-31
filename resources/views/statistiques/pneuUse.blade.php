@@ -9,7 +9,7 @@
 <div class="card col-12">
             <div class="card-header card-success">
 
-              <h3 class="card-title">Gestion de coûts</h3>
+              <h3 class="card-title">Liste des pneus usés</h3>
             </div>
             <!-- /.card-header -->
             <div class="card-body">
@@ -23,29 +23,23 @@
                   <th>Entreprise:</th>
                   @endif
                   <th>Référence:</th>
-
-                  @if(Auth::user()->role=='superadmin')
+                   @if(Auth::user()->role=='superadmin')
                   <th>Pose:</th>
                   <th>Dépose:</th>
-                  <th>Usure moyenne pour 1000 km:</th>
+                  <th>Origine:</th>
                   @endif
-                  <!-- <th>Kilomètrage moyen:</th> -->
-                  <th>Coût du pneu:</th>
+                  <th>Hauteur initiale de gomme:</th>
+                  <th>Hauteur finale de gomme:</th>
+                  <!-- <th>Kilomètrage moyen:</th>> -->
                   <th>Kilométrage parcouru:</th>
-                  @if(Auth::user()->role=='superadmin')
-                  <th>Indice de consommation:</th>
-                  @endif
-                  <th>Carburant:</th>
-                  <th>Surconsommation en l et en €:</th>
-                  <th>Coût de possession:</th>
-                  <th>Prix de revient total d'un pneu pour 1000 km:</th>
+                  <th>Usure moyenne pour 1000 km:</th>
                    @if(Auth::user()->role=='superadmin')
                   <th>Actions:</th>
                   @endif
                 </tr>
-                </thead>
+                </th>
                 <tbody>
-                  @foreach($vehicules as $vehicule)
+                	@foreach($vehicules as $vehicule)
                     @if(isset(unserialize($vehicule->refPneus)[0]))
                         @foreach($References as $Reference)
                           @if($vehicule->id==$Reference->id_vehicule)
@@ -81,7 +75,7 @@
                                     <form action="{{Route('stat.store')}}" method="post">
                                         @csrf
                                         <div class="form-group">
-                                          <label>Réference : </label>
+                                          <label>Référence : </label>
                                           <input type="text" class="form-control" name="reference" value="{{$Reference->id}}" hidden>
                                           <select class="form-control" name="ref" >
                                             @foreach($refPneus as $refPneu)
@@ -97,56 +91,21 @@
                                           </select>
                                         </div>
                                         <div class="form-group">
-                                          <label>Kilomètrage initial: </label>
-                                            <input type="text" class="form-control" name="kinit" value="{{$Reference->kInit}}">
+                                          <label>Kilométrage initial: </label>
+                                            <input type="text" class="form-control" name="kInit" value="{{$Reference->kInit}}">
                                         </div>
                                         <div class="form-group">
-                                          <label>Kilomètrage final: </label>
+                                          <label>Kilométrage final: </label>
                                             <input type="text" class="form-control" name="kFinal" value="{{$Reference->kFinal}}">
                                         </div>
                                         <div class="form-group">
-                                          <label>Coût de la pose: </label>
-                                            <input type="text" class="form-control" name="cout" value="{{$Reference->cout}}">
+                                          <label>Hauteur de gomme initial: </label>
+                                            <input type="text" class="form-control" name="hgInit" value="{{$Reference->hgInit}}">
                                         </div>
                                         <div class="form-group">
-                                          <label>Prix de carburant: </label>
-                                            <input type="text" class="form-control" name="gazole" value="{{$Reference->gazole}}">
+                                          <label>Hauteur de gomme final: </label>
+                                            <input type="text" class="form-control" name="hgFinal" value="{{$Reference->hgFinal}}">
                                         </div>
-                                        <!-- <div class="form-group">
-                                          <label>Indice de consommation: </label>
-                                            <select class="form-control" name="indication">
-                                              @if($Reference->indication=='A')
-                                              <option value="A" selected>A</option>
-                                              @else
-                                              <option value="A" >A</option>
-                                              @endif
-                                              @if($Reference->indication=='B')
-                                              <option value="B" selected>B</option>
-                                              @else
-                                              <option value="B" >B</option>
-                                              @endif
-                                              @if($Reference->indication=='C')
-                                              <option value="C" selected>C</option>
-                                              @else
-                                              <option value="C" >C</option>
-                                              @endif
-                                              @if($Reference->indication=='E')
-                                              <option value="E" selected>E</option>
-                                              @else
-                                              <option value="E" >E</option>
-                                              @endif
-                                              @if($Reference->indication=='F')
-                                              <option value="F" selected>F</option>
-                                              @else
-                                              <option value="F" >F</option>
-                                              @endif
-                                              @if($Reference->indication=='G')
-                                              <option value="G" selected>G</option>
-                                              @else
-                                              <option value="G" >G</option>
-                                              @endif
-                                            </select>
-                                        </div> -->
                                         <button class="bt btn-primary"> Valider</button>
                                     </form>
                                 </div>
@@ -161,8 +120,7 @@
                               <td>{{$vehicule->entreprise}}</td>
                               @endif
                               <td>{{$Reference->reference}}</td>
-
-                              @if(Auth::user()->role=='superadmin')
+                                 @if(Auth::user()->role=='superadmin')
                               <td>
                                 <span hidden>{{strtotime($Reference->pose)}}</span>
                                 {{date('d/m/Y',strtotime($Reference->pose))}}</td>
@@ -170,10 +128,15 @@
                                 <span hidden>{{strtotime($Reference->depose)}}</span>
                                 {{date('d/m/Y',strtotime($Reference->depose))}}</td>
                               <td>
-                                <span hidden>{{round(($Reference->hgInit-$Reference->hgFinal)*1000/($Reference->kFinal-$Reference->kInit),2)/1000}}</span>
-                                {{round(($Reference->hgInit-$Reference->hgFinal)*1000/($Reference->kFinal-$Reference->kInit),2)}} mm
-                              </td> 
+                                @if($Reference->quantite==0)
+                                  hors du stock 
+                                @else
+                                  MMP
+                                @endif
+                              </td>
                               @endif
+                              <td><span hidden>{{($Reference->hgInit)/1000}}</span>{{$Reference->hgInit}} mm</td>
+                              <td><span hidden>{{($Reference->hgFinal)/1000}}</span>{{$Reference->hgFinal}} mm</td>
                               <!-- <td>
                                 <span hidden>
                                   {{$kj=($Reference->kFinal-$Reference->kInit)/($Reference->hgInit-$Reference->hgFinal)}}|
@@ -188,39 +151,13 @@
                                 {{round($kj)}} km / jour
                               </td> -->
                               <td>
-                                <span hidden>{{$Reference->cout/1000}}</span>
-                                {{$Reference->cout}} €</td>
-                              <td>
-                                <span hidden>{{($Reference->kFinal-$Reference->kInit)/100000}}</span>
+                                <span hidden>{{($Reference->kFinal-$Reference->kInit)/1000}}</span>
                                 <!-- {{round(($Reference->prix+$Reference->cout)+($Reference->gazole*$Reference->consommation)*($countk/100),2)}} € pour  -->{{$Reference->kFinal-$Reference->kInit}} km
                               </td>
-
-                  @if(Auth::user()->role=='superadmin')
                               <td>
-                                <span hidden>{{$Reference->consommation/1000}}</span>
-                                {{$Reference->indication}} soit {{$Reference->consommation}} l/100km</td>
-                                @endif
-                              <td> 
-                                <span hidden>{{$Reference->gazole/1000}}</span>
-                                {{$Reference->gazole}} ({{$vehicule->carburant}})</td>
-                              <td>
-                                <span hidden>
-                                   {{round(($Reference->kFinal-$Reference->kInit)*$Reference->consommation/100/4,2)/1000}}
-                                </span>
-                                {{round(($Reference->kFinal-$Reference->kInit)*$Reference->consommation/100/4,2)}} l / {{round((($Reference->kFinal-$Reference->kInit)*$Reference->consommation/100/4)*$Reference->gazole,2)}} €
-                              </td>
-                              <td>
-                                <span hidden>
-                                  {{round((($Reference->kFinal-$Reference->kInit)*$Reference->consommation/100/4)*$Reference->gazole,2)/1000}}
-                                </span>
-                                {{round(((($Reference->kFinal-$Reference->kInit)*$Reference->consommation/100/4)*$Reference->gazole)+$Reference->cout,2)}} €
-                              </td>
-                              <td>
-                                <span hidden>
-                                  {{round((((($Reference->kFinal-$Reference->kInit)*$Reference->consommation/100/4)*$Reference->gazole)+$Reference->cout)/($Reference->kFinal-$Reference->kInit)*1000,2)/1000}}
-                                </span>
-                                {{round((((($Reference->kFinal-$Reference->kInit)*$Reference->consommation/100/4)*$Reference->gazole)+$Reference->cout)/($Reference->kFinal-$Reference->kInit)*1000,2)}} €
-                              </td>
+                                <span hidden>{{round(($Reference->hgInit-$Reference->hgFinal)*1000/($Reference->kFinal-$Reference->kInit),2)/10000}}</span>
+                                {{round(($Reference->hgInit-$Reference->hgFinal)*1000/($Reference->kFinal-$Reference->kInit),2)}} mm
+                              </td> 
                                @if(Auth::user()->role=='superadmin')
                               <td>
                                  <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#exa{{$Reference->id}}" data-toggle="tooltip" data-placement="bottom" title="Modifier">
@@ -231,11 +168,11 @@
                                   </a> 
                               </td>
                               @endif
-                      </tr>
+                      </tr> 
                           @endif
                         @endforeach
                     @endif
-                  @endforeach                             
+		              @endforeach															
                 </tbody>
               </table>
             </div>

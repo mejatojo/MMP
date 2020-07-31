@@ -32,6 +32,9 @@ h3, .h3{font-size:1.25rem!important;}
 .no-webp .hero-contact{background: url('../images/background/abstract-background-hero-contact.jpg') no-repeat center top;background-size:cover;color:#ffffff;}
 .webp .hero-contact{background: url('../images/background/abstract-background-hero-contact.webp') no-repeat center top;background-size:cover;color:#ffffff;}
 /* Content */
+li a:hover{
+    color: black;
+  }
 a{color:#17a2b7;}
 a:hover{text-decoration:none;color:#17a2b7;font-weight:400;}
 textarea{resize:none;height:150px!important;}

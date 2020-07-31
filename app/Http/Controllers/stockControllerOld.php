@@ -18,10 +18,6 @@ class stockController extends Controller
     public function destroy($id)
     {
         $stocks=Stock::where('reference_id',$id)->get();
-        $stat=Statistique::all();
-        foreach ($stat as $st) {
-           $st->delete();
-        }
         foreach ($stocks as $stock) {
             $stock->delete();
         }
@@ -235,7 +231,7 @@ class stockController extends Controller
     }
     public function sauvegarde()
     {
-        File::put('mytextdocument'.date('d_m_Y').'.sql','delete from maintenances;delete from rendez_vous;delete from statistiques;delete from alertes;delete from vehicules;delete from stocks;delete from `references`;delete from users where role!="superadmin" and role!="operateur";');
+        File::put('mytextdocument'.date('d_m_Y').'.sql','delete from maintenances;delete from rendez_vous;delete from statistiques;delete from alertes;delete from vehicules;delete from stocks where hgFinal>0 and kFinal>0;delete from users where role!="superadmin" and role!="operateur";');
         $users=User::where('role','!=','superadmin')->where('role','!=','operateur')->get();
         foreach($users as $u)
         {
@@ -265,16 +261,10 @@ class stockController extends Controller
                 id,reference,prix,indication,consommation) values (
                 ".$reference->id.",'".$reference->reference."',".$reference->prix.",'".$reference->indication."','".$reference->consommation."');");
         }
-        $tstocks=Stock::where('hgInit',null)->get();
+        $tstocks=Stock::where('hgInit',null);
         foreach ($tstocks as $stock) {
             File::append("mytextdocument".date('d_m_Y').".sql","insert into stocks (id,reference_id,quantite,date,source,created_at) values (
                     ".$stock->id.",'".$stock->reference_id."','".$stock->quantite."','".$stock->date."','".$stock->source."','".$stock->created_at.
-                    "');");
-        }
-        $pneus=Stock::where('hgFinal',null)->where('hgInit','!=',null)->get();
-        foreach ($pneus as $stock) {
-            File::append("mytextdocument".date('d_m_Y').".sql","insert into stocks (id,reference_id,quantite,date,source,hgInit,kInit,pose,created_at) values (
-                    ".$stock->id.",'".$stock->reference_id."','".$stock->quantite."','".$stock->date."','".$stock->source."','".$stock->hgInit."','".$stock->kInit."','".$stock->pose."','".$stock->created_at.
                     "');");
         }
          $stocks=Stock::where('hgFinal','!=',null)->where('kFinal','!=',null)->get();
@@ -311,7 +301,8 @@ class stockController extends Controller
             File::append('mytextdocument'.date('d_m_Y').'.sql','insert into alertes (id,vehicule_id,message,created_at,updated_at) values (
                 '.$a->id.',"'.$a->vehicule_id.'","'.$a->message.'","'.$a->created_at.'","'.$a->updated_at.'");');
         }
-         
+
+        
         // $statistiques=Statistique::All();
         // foreach($statistiques as $stat)
         // {

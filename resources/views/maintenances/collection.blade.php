@@ -28,29 +28,29 @@
                                       </div> -->
                                       <!--  -->
                                       <!-- maximale -->
-                                      <label> Hauteur de gomme actuel</label>
+                                      <label> Hauteur de gomme actuelle</label>
                                       <div class="row">
                                         <div class="col-6">
-                                          <input type="text" class="form-control" name="hg[]" placeholder="AVG">
+                                          <input type="text" class="form-control" name="hg[]" placeholder="AVG" required>
                                         </div>
                                         <div class="col-6">
-                                          <input type="text" class="form-control" name="hg[]" placeholder="AVD">
+                                          <input type="text" class="form-control" name="hg[]" placeholder="AVD" required>
                                         </div>
                                       </div>
                                       <div class="row">
                                         <div class="col-6">
-                                          <input type="text" class="form-control" name="hg[]" placeholder="ARG">
+                                          <input type="text" class="form-control" name="hg[]" placeholder="ARG"required>
                                         </div>
                                         <div class="col-6">
-                                          <input type="text" class="form-control" name="hg[]" placeholder="ARD">
+                                          <input type="text" class="form-control" name="hg[]" placeholder="ARD"required>
                                         </div>
                                       </div>
                                       <div class="row cache" >
                                         <div class="col-6">
-                                          <input type="text" class="form-control" name="hg2[]" placeholder="ARG 2">
+                                          <input type="text" class="form-control" name="hg2[]" placeholder="ARG 2" >
                                         </div>
                                         <div class="col-6">
-                                          <input type="text" class="form-control" name="hg2[]" placeholder="ARD2">
+                                          <input type="text" class="form-control" name="hg2[]" placeholder="ARD2" >
                                         </div>
                                       </div>
                                       <!--  -->
@@ -59,11 +59,11 @@
                                   <label>Pressions initiales(maximales): </label>
                                       <div class="row">
                                           <input type="text" class="form-control col-6" name="pneuI[]" placeholder="AVG" hidden>
-                                          <input type="text" class="form-control col-6 init" name="pneuI[]" placeholder="pression AV">
+                                          <input type="text" class="form-control col-6 init" name="pneuI[]" placeholder="pression AV" required>
                                       </div>
                                       <div class="row">
                                           <input type="text" class="form-control col-6" name="pneuI[]" placeholder="AR" hidden>
-                                          <input type="text" class="form-control col-6 init" name="pneuI[]" placeholder="pression AR">
+                                          <input type="text" class="form-control col-6 init" name="pneuI[]" placeholder="pression AR" required>
                                       </div>
                                       <div class="row cache" >
                                           <input type="text" class="form-control col-6" name="pneuI2[]" placeholder="AR 2" hidden>
@@ -74,14 +74,14 @@
 
                                       <label>Réference des pneus</label>
                                      <div class="form-group  row">
-                                      <div class="col-3"></div>
-                                        <select class="form-control col-3" name="ref[]">
+                                      <div class="col-2"></div>
+                                        <select class="form-control col-2 select2" name="ref[]" required>
                                           <option></option>
                                           @foreach($references as $stock)
                                           <option value="{{$stock->id}}">{{$stock->reference}}</option>
                                           @endforeach
                                         </select>
-                                        <select class="form-control col-3" name="ref[]">
+                                        <select class="form-control col-2 select2" name="ref[]" required>
                                           <option></option>
                                           @foreach($references as $stock)
                                           <option value="{{$stock->id}}">{{$stock->reference}}</option>
@@ -90,26 +90,26 @@
                                         <div class="col-3"></div>
                                      </div>
                                      <div class="form-group  row">
-                                      <select class="form-control col-3 cache" name="ref2[]" >
+                                      <select class="form-control col-2 cache select2" name="ref2[]" disabled>
                                         <option></option>
                                           @foreach($references as $stock)
                                           <option value="{{$stock->id}}">{{$stock->reference}}</option>
                                           @endforeach
                                         </select>
-                                        <select class="form-control col-3" name="ref[]">
+                                        <select class="form-control col-2 select2" name="ref[]" required>
                                           <option></option>
                                           @foreach($references as $stock)
                                           <option value="{{$stock->id}}">{{$stock->reference}}</option>
                                           @endforeach
                                         </select>
 
-                                        <select class="form-control col-3" name="ref[]">
+                                        <select class="form-control col-2 select2" name="ref[]" required>
                                           <option></option>
                                           @foreach($references as $stock)
                                           <option value="{{$stock->id}}">{{$stock->reference}}</option>
                                           @endforeach
                                         </select>
-                                      <select class="form-control col-3 cache" name="ref2[]" >
+                                      <select class="form-control col-2 cache select2" name="ref2[]" disabled>
                                         <option></option>
                                           @foreach($references as $stock)
                                           <option value="{{$stock->id}}">{{$stock->reference}}</option>
@@ -119,11 +119,11 @@
                                      <div class="row">
                                     <div class="form-group col-4">
                                       <label for="exampleInputPassword1">kilomètrage: </label>
-                                      <input type="number" class="form-control" id="exampleInputPassword1" name="kilometrage">
+                                      <input type="number" class="form-control" id="exampleInputPassword1" name="kilometrage" required>
                                     </div>
                                     <div class="form-group col-4">
                                       <label for="exampleInputPassword1">Couple serrage: </label>
-                                      <input type="number" class="form-control" id="exampleInputPassword1" name="serrage">
+                                      <input type="number" class="form-control" id="exampleInputPassword1" name="serrage" required>
                                     </div>
                                     <div class="form-group col-4">
                                       <label for="exampleInputPassword1">Type de permutation: </label>
@@ -139,15 +139,16 @@
                                   <div class="row">
                                     <div class="form-group col-4">
                                       <label for="exampleInputPassword1">Nom : </label>
-                                      <input type="text" class="form-control" id="exampleInputPassword1" name="nomH">
+                                      <input type="text" class="form-control" id="exampleInputPassword1" name="nomH" required>
                                     </div>
                                     <div class="form-group col-4">
                                       <label for="exampleInputPassword1">email : </label>
-                                      <input type="email" class="form-control" id="exampleInputPassword1" name="emailH">
+                                      <input type="email" class="form-control" id="exampleInputPassword1" name="emailH" required>
                                     </div>
                                     <div class="form-group col-4">
                                       <label for="exampleInputPassword1">phone : </label>
-                                      <input type="text" class="form-control" id="exampleInputPassword1" name="phoneH">
+                                      <input type="text" class="form-control" id="exampleInputPassword1" name="phoneH" required>
                                     </div>
                                   </div>
+
                                     <!-- <button type="submit" class="btn btn-primary">Ajouter</button> -->

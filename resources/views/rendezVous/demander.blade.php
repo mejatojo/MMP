@@ -16,7 +16,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <iframe src="https://calendar.google.com/calendar/embed?src=5jfn704enpctkok1rjditnds1g%40group.calendar.google.com&ctz=Africa%2FNairobi" style="border: 0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+        <iframe src="https://calendar.google.com/calendar/embed?src=js7fhgkdhh18fp8kqc8025rsoc%40group.calendar.google.com&ctz=Europe%2FParis" style="border: 0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
       </div>
       <div class="modal-footer"><!-- 
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -37,13 +37,13 @@
                   <div class="form-group col-6">
                     <label for="exampleInputPassword1">Date</label>
                     <div class="row">
-                      <input type="date" class="form-control col-6" id="exampleInputPassword1"  name="date">
-                      <input type="time" class="form-control col-3" id="exampleInputPassword1"  name="heure">
+                      <input type="date" class="form-control col-6" id="exampleInputPassword1"  name="date" required>
+                      <input type="time" class="form-control col-3" id="exampleInputPassword1"  name="heure" required>
                     </div>
                   </div>
                   <div class="form-group col-6">
                     <label for="exampleInputPassword1">Véhicule</label>
-                    <select class="form-control" name="vehicule">
+                    <select class="form-control" name="vehicule" required>
                       @foreach($vehicules as $vehicule)
                          <option value="{{$vehicule->ide}}">{{$vehicule->immatriculation}}</option>
                       @endforeach
@@ -53,7 +53,7 @@
                   </div>
                     <div class="form-group col-12">
                         <label>Commentaire : </label>
-                        <textarea class="form-control" rows="3" placeholder="Enter ..." name="comment"></textarea>
+                        <textarea class="form-control" rows="3" placeholder="Enter ..." name="comment" required></textarea>
                     </div>
                 <div class="card-footer">
                   <button type="submit" class="btn btn-primary">Ajouter</button>

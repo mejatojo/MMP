@@ -9,7 +9,7 @@
     
         <div class="col-md-12">
             <div class="card">
-                @if(auth::user()->role=='responsable')
+                @if(auth::user()->role=='responsable' or auth::user()->role=='PDG')
                 <div class="card-header"><h3>Bienvenu sur votre flotte "{{Auth::user()->entreprise}}"</h3>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modifier">
                   Modifier
@@ -56,7 +56,9 @@
                       <thead>
                       <tr>
                         <th>Immatriculation</th>
-                        <th>Marque & Model</th>
+                        <th>Marque</th>
+                        <th>Modele</th>
+                        <th>Commentaire</th>
                         <th>Date</th>
                       </tr>
                       </thead>
@@ -64,8 +66,10 @@
                           @foreach($pRdvs as $pRdv)
                               <tr>
                                 <td>{{$pRdv->immatriculation}}</td>
-                                <td>{{$pRdv->marque}} ({{$pRdv->model}})</td>
-                                <td>{{date('d/m/Y',strtotime($pRdv->date))}} à {{$pRdv->heure}}</td>
+                                <td>{{$pRdv->marque}}</td>
+                                <td> {{$pRdv->model}}</td>
+                                <td>{{$pRdv->commentaire}}</td>
+                                <td><span hidden>{{strtotime($pRdv->date)}}</span>{{date('d/m/Y',strtotime($pRdv->date))}} à {{$pRdv->heure}}</td>
                               </tr>   
                           @endforeach                                                         
                       </tbody>
@@ -76,6 +80,7 @@
                       <tr>
                         <th>Immatriculation</th>
                         <th>Ordre de réparation</th>
+                        <th>Date</th>
                         <th>Facture</th>
                       </tr>
                       </thead>
@@ -84,6 +89,7 @@
                               <tr>
                                 <td>{{$maintenanceEff->immatriculation}}</td>
                                 <td>{{$maintenanceEff->operations}}</td>
+                                <td>{{date('d/m/Y',strtotime($maintenanceEff->date))}}</td>
                                 <td>
                                   @if($maintenanceEff->facture!='')
                                   <a href="/storage/{{$maintenanceEff->facture}}" type="button" class="btn btn-primary">Voir</a></td>
@@ -109,12 +115,14 @@
     $("#example1").DataTable({
       "responsive": true,
       "autoWidth": false,
+      "order": [ 4, 'desc' ]
     });
   });
    $(function () {
     $("#example2").DataTable({
       "responsive": true,
       "autoWidth": false,
+      "order": [ 2, 'desc' ]
     });
   });
 </script>

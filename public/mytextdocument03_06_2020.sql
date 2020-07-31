@@ -1,1 +1,0 @@
-delete from maintenances;delete from rendez_vous;delete from statistiques;delete from vehicules;
