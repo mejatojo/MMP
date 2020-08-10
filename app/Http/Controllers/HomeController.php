@@ -113,9 +113,9 @@ class HomeController extends Controller
                 $vehicule->save();
                 $user=User::find($vehicule->conducteur_id);
                 $details = [
-            'title' => 'Bonjour, MMP vous informe que les pneumatiques avants et/ou arrières du véhicule '.$vehicule->immatriculation
+                'header' => 'Bonjour ,',
+                'p1' => 'MMP vous informe que les pneumatiques avants et/ou arrières du véhicule '.$vehicule->immatriculation
             .' '.$vehicule->model.'('.$vehicule->marque.') doivent être remplacés dans moins de 15 jours. Veuillez vous connecter sur le site de MMP (https://mmp06.fr) pour prendre un rendez_vous',
-            'body' => "l'equipe de MMP",
         ];
         \Mail::to($vehicule->emailH)->send(new SendMail($details));
         \Mail::to($user->email)->send(new SendMail($details));

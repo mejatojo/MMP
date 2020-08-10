@@ -93,7 +93,7 @@
             <li class="nav-item">
               <a href="/home" class="nav-link">
                 <i class="far  fa-handshake"></i>
-                <p>Flotte de {{Auth::user()->entreprise}}</p>
+                <p>Flotte de {{substr(Auth::user()->entreprise,0,9)}}...</p>
               </a>
           </li>
               @endif

@@ -657,7 +657,7 @@
 		                  <td>
 		                  	<span hidden>
 		                  	{{(((strtotime($vehicule->dpermutation)+365*84600)-strtotime(date('Y-m-d')))/84600)/100}}</span>
-		                  	@if(count(unserialize($vehicule->hGomme))==4)
+		                  	@if(count(unserialize($vehicule->hGomme))==4 and $vehicule->type!='aucune')
 		                  @if($vehicule->permutation>0)
 		                  	<span hidden>{{$permutation=0}}</span>
 		                  	Dans 

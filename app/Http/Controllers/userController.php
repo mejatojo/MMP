@@ -115,8 +115,10 @@ class userController extends Controller
 		}
 		
 		$details = [
-            'title' => 'Votre compte MMP a été crée, vos identifiants :'.$req->email.'/'.$req->password.'',
-            'body' => 'Vous pouvez tout de suite accéder à votre compte. Cordialement'
+			'header'=>'Bonjour ,',
+            'p1' => 'Votre  compte MMP pour l\'assistance à la gestion de flotte automobile a été crée. Vous pouvez y accéder avec  :',
+            'p2' => 'L\'identifiant :'.$req->email,
+            'p3'=>' Mot de passe : '.$req->password,
         ];
         \Mail::to($req->email)->send(new SendMail($details));
         $notif=array(

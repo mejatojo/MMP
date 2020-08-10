@@ -172,6 +172,16 @@
                             @endforeach
                           @endif 
                         @endforeach
+                        <span hidden>
+                        {{$nbP=$nbP+$count}}
+                        @if($countv==0)
+                          {{$countv=1}}
+                        @endif
+                        {{$totalhg=$totalhg+$hg}}
+                        <span hidden>{{$totalkmp=$totalkmp+$kmp}}</span> 
+                        <span hidden>{{$totalcout=$totalcout+$cout}}</span> 
+                        <span hidden>{{$totalusure=$totalusure+$usure}}</span>
+                      </span>
                     @if(Auth::user()->entreprise==$entreprise->entreprise)
                        
                     <tr style="">
@@ -188,16 +198,7 @@
 
                       </td>
                       <td>{{$countv}}</td>
-                      <span hidden>
-                        {{$nbP=$nbP+$count}}
-                        @if($countv==0)
-                          {{$countv=1}}
-                        @endif
-                        {{$totalhg=$totalhg+$hg}}
-                        <span hidden>{{$totalkmp=$totalkmp+$kmp}}</span> 
-                        <span hidden>{{$totalcout=$totalcout+$cout}}</span> 
-                        <span hidden>{{$totalusure=$totalusure+$usure}}</span>
-                      </span>
+                      
                       <td>
                         
                       {{round($hgv/$countv,2)}} mm

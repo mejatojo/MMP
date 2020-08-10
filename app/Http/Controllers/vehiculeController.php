@@ -907,21 +907,21 @@ class vehiculeController extends Controller
         if($req->texte=='')
         {
             $details = [
-                'title' => 'Bonjour , votre véhicule immatriculée '.$vehiculeUpdate->immatriculation
-                .' '.$vehiculeUpdate->model.'('.$vehiculeUpdate->marque.') a besoin d\'une maintenance ou d\'un contrôle. Merci de vous connecter sur le site de MMP (https://mmp06.fr) pour  prendre un Rendez-vous.',
-                'body' => "L'équipe de MMP"
+                'header' => 'Bonjour ,',
+                'p1'=>'votre véhicule immatriculée '.$vehiculeUpdate->immatriculation
+                .' '.$vehiculeUpdate->model.'('.$vehiculeUpdate->marque.') a besoin d\'une maintenance ou d\'un contrôle. Merci de vous connecter sur le site de MMP  pour  prendre un Rendez-vous.',
             ];
             $alert=new Alerte();
             $alert->vehicule_id=$req->id;
             $alert->message='Bonjour , votre véhicule immatriculée '.$vehiculeUpdate->immatriculation
-                    .' '.$vehiculeUpdate->model.'('.$vehiculeUpdate->marque.') a besoin d\'une maintenance ou d\'un contrôle. Merci de vous connecter sur le site (https://mmp06.fr) pour  prendre un Rendez-vous.';
+                    .' '.$vehiculeUpdate->model.'('.$vehiculeUpdate->marque.') a besoin d\'une maintenance ou d\'un contrôle. Merci de vous connecter sur le site  pour  prendre un Rendez-vous.';
             $alert->save();
         }
         else
         {
             $details = [
-                'title' => $req->texte,
-                'body' => "L'équipe de MMP"
+                'header' => 'Bonjour ,',
+                'p1' => $req->texte,
             ];
             $alert=new Alerte();
             $alert->vehicule_id=$req->id;

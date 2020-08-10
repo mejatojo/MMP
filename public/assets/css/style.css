@@ -364,8 +364,8 @@ h1, h2, h3, h4, h5, h6 {
 --------------------------------------------------------------*/
 #hero {
   width: 100%;
-  height: 60vh;
-  background: url("../img/fond-mmp-home.jpg") top center;
+  height: 50vh;
+  background: url("../img/fond-mmp-home1.jpg") top center;
   background-size: cover;
   position: relative;
 }
@@ -399,13 +399,13 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 48px;
   font-weight: 700;
   line-height: 56px;
-  color: #fff;
+  color: white;
 }
 
 #hero h2 {
-  color: #eee;
+  color: #d3b85d;
   margin-bottom: 50px;
-  font-size: 24px;
+  font-size: 32px;
 }
 
 #hero .btn-get-started {
@@ -433,9 +433,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 768px) {
-  #hero {
+  /*#hero {
     height: 100vh;
-  }
+  }*/
   #hero h1 {
     font-size: 28px;
     line-height: 36px;
@@ -511,7 +511,7 @@ section {
 }
 
 .about .box-heading h3 {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   color: #353535;
   margin-bottom: 15px;
@@ -674,9 +674,11 @@ section {
 # Why Us
 --------------------------------------------------------------*/
 .why-us .box {
-  padding: 50px 30px;
+  padding: 0px 20px;
   box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.1);
   transition: all ease-in-out 0.3s;
+  border: 1px solid #d3b85d;
+  height: 10cm;
 }
 
 .why-us .box span {
@@ -695,7 +697,7 @@ section {
 }
 
 .why-us .box p {
-  color: #919191;
+  
   font-size: 15px;
   margin: 0;
   padding: 0;
@@ -703,7 +705,7 @@ section {
 
 .why-us .box:hover {
   background: #d3b85d;
-  padding: 30px 30px 70px 30px;
+  padding: 0px 20px;
   box-shadow: 10px 15px 30px rgba(0, 0, 0, 0.18);
 }
 
@@ -775,8 +777,8 @@ section {
 --------------------------------------------------------------*/
 .services .icon-box {
   text-align: center;
-  border: 1px solid #e5f0d5;
-  padding: 80px 20px;
+  border: 1px solid #d3b85d;
+  padding: 30px 20px;
   transition: all ease-in-out 0.3s;
   background: #fff;
 }
@@ -804,7 +806,7 @@ section {
 .services .icon-box h4 {
   font-weight: 700;
   margin-bottom: 15px;
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .services .icon-box h4 a {
@@ -819,7 +821,7 @@ section {
 }
 
 .services .icon-box:hover {
-  border-color: #fff;
+  border-color: black;
   box-shadow: 0px 0 25px 0 rgba(0, 0, 0, 0.1);
 }
 

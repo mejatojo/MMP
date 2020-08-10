@@ -185,7 +185,14 @@ class stockController extends Controller
             $stock=new Stock();
             $stock->reference_id=$ref->id;
             $stock->date=date('d/m/y H:i:s');
-            $stock->quantite=$req->quantite;
+            if($req->quantite==null)
+            {
+                $stock->quantite=0;
+            }
+            else
+            {
+                $stock->quantite=$req->quantite;
+            }
             $stock->source=$req->source;
             $stock->save();
         }
@@ -245,37 +252,46 @@ class stockController extends Controller
         $vehicules=Vehicule::All();
         foreach ($vehicules as $vehicule) {
             File::append("mytextdocument".date('d_m_Y').".sql","insert into vehicules(id,immatriculation,marque,model,pneu,derniereMaintenance,etatPneu,dpression,control,cConstant,refPneus,refPneuInit,t1,t2,tConstant,kilometrage,permutation,dpermutation,etatPneuInit,dernierePerte,hGomme,conducteur_id,alert,dateAlert,alertP,dateAlertP,dateC,serrage,type,active,nomH,emailH,phoneH,information,imageV,imageV2,observations,factureV,stationnement,carburant,limiteHg,limiteP,limitePression) 
-                values (".$vehicule->id.",'".$vehicule->immatriculation."','".$vehicule->marque."','".$vehicule->model."','".$vehicule->pneu."','".$vehicule->derniereMaintenance."','".$vehicule->etatPneu."','".$vehicule->dpression."','".$vehicule->control."','".$vehicule->cConstant."','".$vehicule->refPneus."','".$vehicule->refPneuInit."','".$vehicule->t1."','".$vehicule->t2."','".$vehicule->tConstant."','".$vehicule->kilometrage."','".$vehicule->permutation."','".$vehicule->dpermutation."','".$vehicule->etatPneuInit."','".$vehicule->dernierePerte."','".$vehicule->hGomme."','".$vehicule->conducteur_id."','".$vehicule->alert."','".$vehicule->dateAlert."','".$vehicule->alertP."','".$vehicule->dateAlertP."','".$vehicule->dateC."','".$vehicule->serrage."','".$vehicule->type."','".$vehicule->active."','".$vehicule->nomH."','".$vehicule->emailH."','".$vehicule->phoneH."','".$vehicule->information."','".$vehicule->imageV."','".$vehicule->imageV2."','".$vehicule->observations."','".$vehicule->factureV."','".$vehicule->stationnement."','".$vehicule->carburant."','".$vehicule->limiteHg."','".$vehicule->limiteP."','".$vehicule->limitePression."');");
+                values (".$vehicule->id.',"'.$vehicule->immatriculation.'","'.$vehicule->marque.'","'.$vehicule->model.'",\''.$vehicule->pneu."','".$vehicule->derniereMaintenance."','".$vehicule->etatPneu."','".$vehicule->dpression."','".$vehicule->control."','".$vehicule->cConstant."','".$vehicule->refPneus."','".$vehicule->refPneuInit."','".$vehicule->t1."','".$vehicule->t2."','".$vehicule->tConstant."','".$vehicule->kilometrage."','".$vehicule->permutation."','".$vehicule->dpermutation."','".$vehicule->etatPneuInit."','".$vehicule->dernierePerte."','".$vehicule->hGomme."','".$vehicule->conducteur_id."','".$vehicule->alert."','".$vehicule->dateAlert."','".$vehicule->alertP."','".$vehicule->dateAlertP."','".$vehicule->dateC."','".$vehicule->serrage."','".$vehicule->type."','".$vehicule->active."','".$vehicule->nomH."','".$vehicule->emailH."','".$vehicule->phoneH."',\"".$vehicule->information."\",'".$vehicule->imageV."','".$vehicule->imageV2."',\"".$vehicule->observations."\",'".$vehicule->factureV."','".$vehicule->stationnement."','".$vehicule->carburant."','".$vehicule->limiteHg."','".$vehicule->limiteP."','".$vehicule->limitePression."');");
         }
         $rdvs=RendezVous::All();
         foreach($rdvs as $rdv)
         {
             File::append("mytextdocument".date('d_m_Y').".sql","insert into rendez_vous (id,date,heure,vehicule_id,commentaire,accepted,finished,raison,calendarId,created_at) values (
-                ".$rdv->id.",'".$rdv->date."','".$rdv->heure."','".$rdv->vehicule_id."','".$rdv->commentaire."','".$rdv->accepted."','".$rdv->finished."','".$rdv->raison."','".$rdv->calendarId."','".$rdv->created_at."');");
+                ".$rdv->id.",'".$rdv->date."','".$rdv->heure."','".$rdv->vehicule_id."',\"".$rdv->commentaire."\",'".$rdv->accepted."','".$rdv->finished."','".$rdv->raison."','".$rdv->calendarId."','".$rdv->created_at."');");
         }
         $maintenances=Maintenance::where('debut','!=',null)->where('fin','!=',null)->where('kilometrageIn','!=',null)->get();
         foreach($maintenances as $main)
         {
             File::append("mytextdocument".date('d_m_Y').".sql","insert into maintenances (id,debut,fin,operations,observations,rdv_id,facture,imageIn1,imageIn2,hGommeIn,referenceIn,kilometrageIn,permutationIn,dControl) values (
-                ".$main->id.",'".$main->debut."','".$main->fin."','".$main->operations."','".$main->observations."','".$main->rdv_id."','".$main->facture."','".$main->imageIn1."','".$main->imageIn2."','".$main->hGommeIn."','".$main->referenceIn."','".$main->kilometrageIn."','".$main->permutationIn."','".$main->dControl."');");
+                ".$main->id.",'".$main->debut."','".$main->fin."',\"".$main->operations."\",\"".$main->observations."\",'".$main->rdv_id."',\"".$main->facture."\",\"".$main->imageIn1."\",\"".$main->imageIn2."\",'".$main->hGommeIn."','".$main->referenceIn."','".$main->kilometrageIn."','".$main->permutationIn."','".$main->dControl."');");
         }
         $references=Reference::all();
         foreach ($references as $reference) {
             File::append("mytextdocument".date('d_m_Y').".sql","insert into `references` (
                 id,reference,prix,indication,consommation) values (
-                ".$reference->id.",'".$reference->reference."',".$reference->prix.",'".$reference->indication."','".$reference->consommation."');");
+                ".$reference->id.",\"".$reference->reference."\",".$reference->prix.",'".$reference->indication."','".$reference->consommation."');");
         }
         $tstocks=Stock::where('hgInit',null)->get();
         foreach ($tstocks as $stock) {
             File::append("mytextdocument".date('d_m_Y').".sql","insert into stocks (id,reference_id,quantite,date,source,created_at) values (
-                    ".$stock->id.",'".$stock->reference_id."','".$stock->quantite."','".$stock->date."','".$stock->source."','".$stock->created_at.
+                    ".$stock->id.",'".$stock->reference_id."','".$stock->quantite."','".$stock->date."',\"".$stock->source."\",'".$stock->created_at.
                     "');");
         }
         $pneus=Stock::where('hgFinal',null)->where('hgInit','!=',null)->get();
         foreach ($pneus as $stock) {
-            File::append("mytextdocument".date('d_m_Y').".sql","insert into stocks (id,reference_id,quantite,date,source,hgInit,kInit,pose,created_at) values (
-                    ".$stock->id.",'".$stock->reference_id."','".$stock->quantite."','".$stock->date."','".$stock->source."','".$stock->hgInit."','".$stock->kInit."','".$stock->pose."','".$stock->created_at.
-                    "');");
+            if($stock->cout==null)
+            {
+                File::append("mytextdocument".date('d_m_Y').".sql","insert into stocks (id,reference_id,quantite,date,source,hgInit,kInit,pose,created_at) values (
+                        ".$stock->id.",'".$stock->reference_id."','".$stock->quantite."','".$stock->date."',\"".$stock->source."\",'".$stock->hgInit."','".$stock->kInit."','".$stock->pose."','".$stock->created_at.
+                        "');");
+            }
+            else
+            {
+                File::append("mytextdocument".date('d_m_Y').".sql","insert into stocks (id,reference_id,quantite,date,source,cout,hgInit,kInit,pose,created_at) values (
+                        ".$stock->id.",'".$stock->reference_id."','".$stock->quantite."','".$stock->date."',\"".$stock->source."\",'".$stock->cout."','".$stock->hgInit."','".$stock->kInit."','".$stock->pose."','".$stock->created_at.
+                        "');");
+            }
         }
          $stocks=Stock::where('hgFinal','!=',null)->where('kFinal','!=',null)->get();
         foreach($stocks as $stock)

@@ -40,7 +40,7 @@
                                 </div> 
                                 <div class="form-group">
                                   <label>Prix: </label>
-                                    <input type="text" class="form-control" name="prix">
+                                    <input type="text" class="form-control" name="prix" required>
                                 </div>
                                 <div class="form-group">
                                     <label>Indice de consommation: </label>

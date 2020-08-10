@@ -115,7 +115,7 @@
                       @endif
                       <td>
                         Dernier contrôle : {{date('d/m/Y',strtotime($vehicule->control))}}
-            <div class="ty" style="width: 15cm;">
+            <div class="ty" style="width: 17cm;">
                 <span class="tytext">
                   @if($vehicule->etatPneu)
                         <div class="row" style="width: 100%;">
@@ -583,7 +583,7 @@
                       @endif
                       <td>
                         Dernier contrôle : {{date('d/m/Y',strtotime($vehicule->control))}}
-            <div class="ty" style="width: 15cm;">
+            <div class="ty" style="width: 17cm;">
                 <span class="tytext">
                   @if($vehicule->etatPneu)
                         <div class="row" style="width: 100%;">
@@ -1029,7 +1029,7 @@
                       @endif
                        <td>
                         Dernier contrôle : {{date('d/m/Y',strtotime($vehicule->control))}}
-            <div class="ty" style="width: 15cm;">
+            <div class="ty" style="width: 17cm;">
                 <span class="tytext">
                   @if($vehicule->etatPneu)
                         <div class="row" style="width: 100%;">
@@ -1500,7 +1500,7 @@
                       @endif
                         <td>
                         Dernier contrôle : {{date('d/m/Y',strtotime($vehicule->control))}}
-            <div class="ty" style="width: 15cm;">
+            <div class="ty" style="width: 17cm;">
                 <span class="tytext">
                   @if($vehicule->etatPneu)
                         <div class="row" style="width: 100%;">

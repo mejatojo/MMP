@@ -33,8 +33,9 @@ class predictionController extends Controller
     public function contact(Request $req)
     {
         $details = [
-            'title' => $req->su.' : '.$req->body,
-            'body' => 'Expéditeur : '.$req->name.'    ('.$req->email.')',
+            'header' => $req->su.' : '.$req->body,
+            'p1' => 'Expéditeur : '.$req->name.'    ('.$req->email.')',
+            'p8'=>'o',
         ];
         \Mail::to('contactmmp06@gmail.com')->send(new SendMail($details));
         $notif=array(
@@ -42,7 +43,7 @@ class predictionController extends Controller
             'alert-type'=>'success'
         );
         return redirect()->back()->with($notif);
-    }
+    } 
     public function index()
     {
         $References=DB::table('references')
@@ -153,9 +154,9 @@ class predictionController extends Controller
         if($req->texte=='')
         { 
         $details = [
-            'title' => 'Bonjour, MMP vous informe que les pneumatiques avants et/ou arrières du véhicule '.$vehicule[0]->immatriculation
+            'header' => 'Bonjour ,',
+            'p1' => 'Bonjour, MMP vous informe que les pneumatiques avants et/ou arrières du véhicule '.$vehicule[0]->immatriculation
             .' '.$vehicule[0]->model.'('.$vehicule[0]->marque.') doivent être remplacés dans moins de 15 jours. Veuillez vous connecter sur le site https://mmp06.fr pour prendre un rendez_vous',
-            'body' => "l'equipe de MMP",
         ];
         $alert=new Alerte();
             $alert->vehicule_id=$req->id;
@@ -166,8 +167,8 @@ class predictionController extends Controller
         else
         {
             $details = [
-                'title' => $req->texte,
-                'body' => "L'équipe de MMP"
+                'header' => 'Bonjour ,',
+                'p1' => $req->texte,
             ];
             $alert=new Alerte();
             $alert->vehicule_id=$req->id;
