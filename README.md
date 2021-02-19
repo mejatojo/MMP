@@ -39,7 +39,7 @@ Lance le serveur
 - Ajout d'un véhicule associé à une entreprise, modification et suppression<br>
 - Prédiction, prédire quand est-ce qu'un véhicule doit changer ses pneus<br>
 - Maintenance, enregistrement des maintenances effectués par véhicule,modification, suppression (pression, changer des pneus, mise à jour des pneus)<br>
-- Rendez-vous, ajout d'un rendez-vous par le client; acceptation ou réfus d'un rendez-vous par le superadmin<br>
+- Rendez-vous, ajout d'un rendez-vous par le client; acceptation ou réfus d'un rendez-vous par le superadmin (les rendez_vous acceptés sont ajoutés automatiquement au google agenda de l'entreprise)<br>
 - Pneu usés, liste des pneu utilisés enregistrés automatiquement pendant la maintenance<br>
 - Stock, gestion de stock qui concerne les pneus disponibles, les détails des nombres des pneus<br>
 - Facturation, le superadmin facture les maintenances effectuées et l'entreprise appartenant la véhicule facturée peut voir la facture<br>
